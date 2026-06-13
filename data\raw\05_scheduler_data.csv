@@ -1,0 +1,61 @@
+schedule_id,post_id,platform,brand_name,caption_preview,scheduled_date,scheduled_time,day_of_week,hour,status,publish_result,actual_publish_time,publisher_used
+sch001,post_001,Instagram,StyleCo,"Just launched our new summer collection! Swipe to see all looks 💫",2025-06-03,11:00:00,Tuesday,11,published,success,2025-06-03 11:00:23,instagram_publisher
+sch002,post_002,Instagram,FitLife,"Morning motivation: You are one workout away from a good mood 💪",2025-06-02,07:00:00,Monday,7,published,success,2025-06-02 07:00:18,instagram_publisher
+sch003,post_003,Instagram,TasteBlog,"Homemade pasta from scratch. 3 ingredients. 30 minutes. Pure happiness 🍝",2025-06-07,12:00:00,Saturday,12,published,success,2025-06-07 12:00:31,instagram_publisher
+sch004,post_004,Instagram,WanderLens,"Golden hour hits different when you have the perfect view 🌅",2025-06-06,18:00:00,Friday,18,published,success,2025-06-06 18:00:09,instagram_publisher
+sch005,post_005,Instagram,GlowUp,"New skincare routine drop! My skin has never been clearer 🌿",2025-06-04,09:00:00,Wednesday,9,published,success,2025-06-04 09:00:44,instagram_publisher
+sch006,post_006,Instagram,BrewBooks,"Coffee + good book + rainy day = perfect Sunday ☕📚",2025-06-01,10:00:00,Sunday,10,published,success,2025-06-01 10:00:15,instagram_publisher
+sch007,post_007,Instagram,StyleCo,"Behind the scenes of our latest photoshoot 🎬",2025-06-05,14:00:00,Thursday,14,published,success,2025-06-05 14:00:27,instagram_publisher
+sch008,post_008,Instagram,TechCreate,"This AI tool helped me schedule 30 posts in 10 minutes 🤖",2025-06-03,08:00:00,Tuesday,8,published,success,2025-06-03 08:00:52,instagram_publisher
+sch009,post_009,Instagram,HealthyEats,"Avocado toast but make it aesthetic 🥑 Recipe saved in highlights",2025-06-07,09:00:00,Saturday,9,published,success,2025-06-07 09:00:14,instagram_publisher
+sch010,post_010,Instagram,FitLife,"Sweat now glow later ✨ 5am club is the best decision",2025-06-02,05:00:00,Monday,5,published,success,2025-06-02 05:00:38,instagram_publisher
+sch011,post_011,Facebook,BrandX,"We just hit 100K followers! 🎉 Thank you for being part of our journey",2025-06-04,12:00:00,Wednesday,12,published,success,2025-06-04 12:00:11,facebook_publisher
+sch012,post_012,Facebook,StyleCo,"Flash Sale: 50% OFF everything for the next 24 hours! 🛒",2025-06-06,10:00:00,Friday,10,published,success,2025-06-06 10:00:29,facebook_publisher
+sch013,post_013,Facebook,DecorHub,"Our customer Priya transformed her living room using our decor tips 🏠",2025-06-05,15:00:00,Thursday,15,published,success,2025-06-05 15:00:08,facebook_publisher
+sch014,post_014,Facebook,BrewBooks,"Poll: Which is your go-to morning drink? ☕🍵",2025-06-03,08:00:00,Tuesday,8,published,success,2025-06-03 08:00:41,facebook_publisher
+sch015,post_015,Facebook,BrandX,"10 years ago we started in a garage. Today we serve 50K customers 🚀",2025-06-02,11:00:00,Monday,11,published,success,2025-06-02 11:00:16,facebook_publisher
+sch016,post_016,Facebook,TasteBlog,"Summer BBQ tips nobody told you about 🔥",2025-06-07,16:00:00,Saturday,16,published,success,2025-06-07 16:00:33,facebook_publisher
+sch017,post_017,Facebook,TechCreate,"Free webinar Saturday: How to grow Instagram to 10K in 90 days! 👇",2025-06-04,09:00:00,Wednesday,9,published,success,2025-06-04 09:00:22,facebook_publisher
+sch018,post_018,Facebook,BrandX,"70% of people trust friend recommendations over ads ❤️",2025-06-03,13:00:00,Tuesday,13,published,success,2025-06-03 13:00:07,facebook_publisher
+sch019,post_019,Twitter,TechCreate,"Hot take: scheduling posts the night before saves 2 hours every day 🧵",2025-06-04,08:00:00,Wednesday,8,published,success,2025-06-04 08:00:19,twitter_publisher
+sch020,post_020,Twitter,GrowthLab,"Just discovered posting at 8am Tuesdays gets 3x more reach on LinkedIn 📊",2025-06-03,08:00:00,Tuesday,8,published,success,2025-06-03 08:00:44,twitter_publisher
+sch021,post_021,Twitter,TechCreate,"Thread: 7 AI tools every content creator needs in 2025 👇",2025-06-02,09:00:00,Monday,9,published,success,2025-06-02 09:00:31,twitter_publisher
+sch022,post_022,Twitter,GrowthLab,"Unpopular opinion: quality > quantity in social media posts",2025-06-05,11:00:00,Thursday,11,published,success,2025-06-05 11:00:15,twitter_publisher
+sch023,post_023,Twitter,TechCreate,"BREAKING: Instagram changed its algorithm. Here is what to do RIGHT NOW ⚡",2025-06-06,07:00:00,Friday,7,published,success,2025-06-06 07:00:48,twitter_publisher
+sch024,post_024,Twitter,GrowthLab,"Real talk: Best time to post on Twitter is when your audience is awake 📱",2025-06-03,07:00:00,Tuesday,7,published,success,2025-06-03 07:00:22,twitter_publisher
+sch025,post_025,Twitter,TechCreate,"We automated our social media workflow using AI and saved 15 hours/week ⬇️",2025-06-04,10:00:00,Wednesday,10,published,success,2025-06-04 10:00:09,twitter_publisher
+sch026,post_026,LinkedIn,GrowthLab,"5 lessons learned after growing a brand from 0 to 500K in 18 months 👇",2025-06-03,08:00:00,Tuesday,8,published,success,2025-06-03 08:00:37,linkedin_publisher
+sch027,post_027,LinkedIn,TechCreate,"The future of marketing is AI + human creativity. Neither alone is enough.",2025-06-04,09:00:00,Wednesday,9,published,success,2025-06-04 09:00:14,linkedin_publisher
+sch028,post_028,LinkedIn,BrandX,"Hiring: Looking for a Social Media Manager who thinks in data ✉️",2025-06-02,10:00:00,Monday,10,published,success,2025-06-02 10:00:43,linkedin_publisher
+sch029,post_029,LinkedIn,GrowthLab,"From intern to CMO in 8 years. The 3 decisions that changed everything.",2025-06-05,07:00:00,Thursday,7,published,success,2025-06-05 07:00:28,linkedin_publisher
+sch030,post_030,LinkedIn,GrowthLab,"Why 80% of B2B companies are wasting their LinkedIn budget.",2025-06-06,08:00:00,Friday,8,published,success,2025-06-06 08:00:17,linkedin_publisher
+sch031,post_031,Instagram,WanderLens,"POV: You discover this hidden café in Bali 🌴",2025-06-01,18:00:00,Sunday,18,published,success,2025-06-01 18:00:41,instagram_publisher
+sch032,post_032,Instagram,StyleCo,"That feeling when your order finally arrives 📦 Unboxing limited edition!",2025-06-05,19:00:00,Thursday,19,published,success,2025-06-05 19:00:26,instagram_publisher
+sch033,post_033,Facebook,GrowthLab,"Customer Spotlight: How Rahul grew his bakery using social media 👇",2025-06-03,14:00:00,Tuesday,14,published,success,2025-06-03 14:00:53,facebook_publisher
+sch034,post_034,Twitter,BrandX,"The 3am ideas are always the best ones. Anyone else? 💡",2025-06-06,23:00:00,Friday,23,published,success,2025-06-06 23:00:18,twitter_publisher
+sch035,post_035,LinkedIn,GrowthLab,"I reviewed 200 LinkedIn profiles of top marketers. The pattern they follow.",2025-06-04,07:00:00,Wednesday,7,published,success,2025-06-04 07:00:35,linkedin_publisher
+sch036,post_036,Instagram,HealthyEats,"5 ingredients budget dinner that tastes like a restaurant meal 🍳",2025-06-11,18:00:00,Wednesday,18,published,success,2025-06-11 18:00:22,instagram_publisher
+sch037,post_037,Instagram,TechCreate,"This one caption template gets me 300 comments every time 📸",2025-06-10,11:00:00,Tuesday,11,published,success,2025-06-10 11:00:48,instagram_publisher
+sch038,post_038,Facebook,WellBeingHub,"It is okay to take a break. Mental health matters 💚",2025-06-08,14:00:00,Sunday,14,published,success,2025-06-08 14:00:13,facebook_publisher
+sch039,post_039,Twitter,GrowthLab,"Data thread: I analyzed 1000 viral tweets. Here are 6 patterns 🧵",2025-06-07,09:00:00,Monday,9,published,success,2025-06-07 09:00:39,twitter_publisher
+sch040,post_040,LinkedIn,TechCreate,"Rejected from 30 companies before landing my dream job at Google.",2025-06-07,08:00:00,Monday,8,published,success,2025-06-07 08:00:27,linkedin_publisher
+sch041,post_041,Instagram,BrandX,"Monday energy check: Drop your mood in the comments 🔥",2025-06-07,08:00:00,Monday,8,published,success,2025-06-07 08:00:16,instagram_publisher
+sch042,post_042,Instagram,TechCreate,"This reel took 6 hours to make. Was it worth it? 🎬",2025-06-11,20:00:00,Friday,20,published,success,2025-06-11 20:00:31,instagram_publisher
+sch043,post_043,Facebook,StyleCo,"GIVEAWAY 🎁 Win premium content creator kit worth ₹15000!",2025-06-12,11:00:00,Saturday,11,published,success,2025-06-12 11:00:08,facebook_publisher
+sch044,post_044,Twitter,GrowthLab,"Nobody talks about the loneliness of building from scratch. A thread 🧵",2025-06-08,21:00:00,Sunday,21,published,success,2025-06-08 21:00:44,twitter_publisher
+sch045,post_045,LinkedIn,GrowthLab,"LinkedIn algorithm rewards consistency. Proof from my last 90 days 📊",2025-06-10,08:00:00,Thursday,8,published,success,2025-06-10 08:00:19,linkedin_publisher
+sch046,post_046,Instagram,PlannerCo,"POV: Monday but you have your planner sorted 📓",2025-06-07,06:00:00,Monday,6,published,success,2025-06-07 06:00:35,instagram_publisher
+sch047,post_047,Instagram,StyleCo,"We hit 500K! Could not have done this without you 🤍",2025-06-11,20:00:00,Wednesday,20,published,success,2025-06-11 20:00:21,instagram_publisher
+sch048,post_048,Facebook,BrandX,"What do you wish you knew before starting your business? 👇",2025-06-08,12:00:00,Tuesday,12,published,success,2025-06-08 12:00:47,facebook_publisher
+sch049,post_049,Twitter,GrowthLab,"If your brand had a personality describe it in 3 words. Go 👇",2025-06-10,13:00:00,Thursday,13,published,success,2025-06-10 13:00:12,twitter_publisher
+sch050,post_050,LinkedIn,GrowthLab,"Here is the exact email I sent to land a $50K client 📧",2025-06-09,09:00:00,Monday,9,published,success,2025-06-09 09:00:38,linkedin_publisher
+sch051,post_A1,Instagram,StyleCo,"Summer collection preview: 3 looks for 3 different occasions 👗",2025-06-18,11:00:00,Wednesday,11,pending,,, instagram_publisher
+sch052,post_A2,Facebook,BrandX,"This week we are giving away our best ebook for FREE. Comment YES to get it 📚",2025-06-18,09:00:00,Wednesday,9,pending,,,facebook_publisher
+sch053,post_A3,Twitter,TechCreate,"Here is how we grew a Twitter account from 200 to 50K in 6 months 🧵",2025-06-19,08:00:00,Thursday,8,pending,,,twitter_publisher
+sch054,post_A4,LinkedIn,GrowthLab,"The real reason most LinkedIn posts fail (and it is not what you think)",2025-06-19,07:00:00,Thursday,7,pending,,,linkedin_publisher
+sch055,post_A5,Instagram,WanderLens,"7 hidden beaches in India that nobody talks about 🏖️",2025-06-20,18:00:00,Friday,18,pending,,,instagram_publisher
+sch056,post_A6,Facebook,TasteBlog,"3 pasta recipes under 30 minutes that your family will request every week",2025-06-20,12:00:00,Friday,12,pending,,,facebook_publisher
+sch057,post_A7,Twitter,GrowthLab,"Controversial: Most personal branding advice is wrong. Here is what actually works.",2025-06-21,09:00:00,Saturday,9,failed,api_rate_limit_exceeded,,twitter_publisher
+sch058,post_A8,Instagram,GlowUp,"Morning skincare routine: the 5 steps that changed my skin completely",2025-06-17,09:00:00,Tuesday,9,published,success,2025-06-17 09:00:22,instagram_publisher
+sch059,post_A9,Facebook,FitLife,"How to stay consistent with fitness when life gets busy. Real strategies.",2025-06-17,10:00:00,Tuesday,10,published,success,2025-06-17 10:00:15,facebook_publisher
+sch060,post_A10,LinkedIn,TechCreate,"I built an AI-powered content pipeline. Here is the full breakdown with tools.",2025-06-16,08:00:00,Monday,8,published,success,2025-06-16 08:00:43,linkedin_publisher

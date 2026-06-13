@@ -1,0 +1,36 @@
+trend_id,keyword,category,platform,trend_score,search_volume_index,date_recorded,source,related_hashtags,is_rising
+tr001,AI tools,Technology,Instagram,92,87,2025-06-15,RSS+Pytrends,"#AITools #ArtificialIntelligence #ChatGPT #AIMarketing",1
+tr002,content creator,Marketing,Instagram,88,82,2025-06-15,RSS+Pytrends,"#ContentCreator #CreatorEconomy #UGC #ContentMarketing",1
+tr003,morning routine,Lifestyle,Instagram,85,79,2025-06-15,RSS+Pytrends,"#MorningRoutine #5AMClub #DailyRoutine #Productivity",0
+tr004,skincare glow,Beauty,Instagram,83,76,2025-06-15,RSS+Pytrends,"#SkincareGlow #GlowUp #SkincareTips #CleanBeauty",1
+tr005,budget recipe,Food,Instagram,79,73,2025-06-15,RSS+Pytrends,"#BudgetCooking #EasyRecipes #MealPrep #HomeCooking",0
+tr006,travel hidden gems,Travel,Instagram,91,85,2025-06-15,RSS+Pytrends,"#HiddenGems #TravelBlogger #Wanderlust #OffBeatTravel",1
+tr007,fitness motivation,Fitness,Instagram,86,80,2025-06-15,RSS+Pytrends,"#FitnessMotivation #GymLife #WorkoutGoals #FitnessTips",0
+tr008,LinkedIn growth,Business,LinkedIn,94,88,2025-06-15,RSS+Pytrends,"#LinkedInGrowth #PersonalBranding #LinkedInTips #B2B",1
+tr009,personal branding,Business,LinkedIn,90,84,2025-06-15,RSS+Pytrends,"#PersonalBranding #ProfessionalGrowth #CareerTips #Branding",1
+tr010,startup story,Business,LinkedIn,82,76,2025-06-15,RSS+Pytrends,"#StartupStory #Entrepreneurship #FounderLife #StartupLife",0
+tr011,viral tweet,Social Media,Twitter,89,83,2025-06-15,RSS+Pytrends,"#ViralTweet #TwitterGrowth #Trending #ContentStrategy",1
+tr012,social media algorithm,Marketing,Twitter,93,87,2025-06-15,RSS+Pytrends,"#SocialMediaAlgorithm #AlgorithmUpdate #DigitalMarketing",1
+tr013,automation tools,Technology,Twitter,87,81,2025-06-15,RSS+Pytrends,"#AutomationTools #AIAutomation #ProductivityTools #WorkSmart",1
+tr014,giveaway,Engagement,Facebook,95,89,2025-06-15,RSS+Pytrends,"#Giveaway #ContestAlert #WinBig #FreeGiveaway",0
+tr015,customer story,Marketing,Facebook,81,75,2025-06-15,RSS+Pytrends,"#CustomerStory #Testimonial #CustomerSuccess #SocialProof",0
+tr016,mental health,Wellbeing,Facebook,96,90,2025-06-15,RSS+Pytrends,"#MentalHealth #SelfCare #Wellbeing #DigitalDetox",1
+tr017,food photography,Food,Instagram,84,78,2025-06-15,RSS+Pytrends,"#FoodPhotography #FoodStyling #FoodBlogger #FoodContent",0
+tr018,reel tutorial,Content,Instagram,90,84,2025-06-15,RSS+Pytrends,"#ReelTutorial #ReelTips #InstagramReels #VideoContent",1
+tr019,career rejection,Career,LinkedIn,88,82,2025-06-15,RSS+Pytrends,"#CareerRejection #JobSearch #CareerAdvice #NeverGiveUp",1
+tr020,data driven marketing,Marketing,LinkedIn,86,80,2025-06-15,RSS+Pytrends,"#DataDrivenMarketing #MarketingAnalytics #DataMarketing",1
+tr001,AI tools,Technology,Instagram,94,88,2025-06-16,RSS+Pytrends,"#AITools #ArtificialIntelligence #ChatGPT #AIMarketing",1
+tr002,content creator,Marketing,Instagram,87,81,2025-06-16,RSS+Pytrends,"#ContentCreator #CreatorEconomy #UGC #ContentMarketing",1
+tr003,morning routine,Lifestyle,Instagram,83,77,2025-06-16,RSS+Pytrends,"#MorningRoutine #5AMClub #DailyRoutine #Productivity",0
+tr004,skincare glow,Beauty,Instagram,85,79,2025-06-16,RSS+Pytrends,"#SkincareGlow #GlowUp #SkincareTips #CleanBeauty",1
+tr005,budget recipe,Food,Instagram,80,74,2025-06-16,RSS+Pytrends,"#BudgetCooking #EasyRecipes #MealPrep #HomeCooking",0
+tr021,World Environment Day,News,Instagram,98,93,2025-06-05,RSS_News,"#WorldEnvironmentDay #Sustainability #GoGreen #ClimateAction",1
+tr022,IPL Final,Sports,Instagram,97,92,2025-06-15,RSS_News,"#IPL2025 #IPLFinal #Cricket #IndianCricket",1
+tr023,Budget 2025,Finance,LinkedIn,96,91,2025-06-15,RSS_News,"#Budget2025 #UnionBudget #IndiaEconomy #Finance",1
+tr024,AI regulation,Technology,Twitter,93,87,2025-06-14,RSS_News,"#AIRegulation #AILaw #ArtificialIntelligence #TechPolicy",1
+tr025,startup funding,Business,LinkedIn,89,83,2025-06-13,RSS_News,"#StartupFunding #VentureCapital #IndiaStartup #Funding",1
+tr026,summer sale,Shopping,Facebook,91,85,2025-06-12,RSS_News,"#SummerSale #DiscountSeason #Shopping #SaleAlert",0
+tr027,yoga day,Health,Instagram,95,89,2025-06-21,RSS_News,"#InternationalYogaDay #Yoga #YogaLife #WellnessJourney",1
+tr028,electric vehicles,Technology,Facebook,88,82,2025-06-11,RSS_News,"#ElectricVehicles #EV #GreenTech #SustainableTransport",1
+tr029,remote work tips,Career,LinkedIn,84,78,2025-06-10,RSS_News,"#RemoteWork #WorkFromHome #RemoteWorkTips #DigitalNomad",0
+tr030,micro influencer,Marketing,Instagram,87,81,2025-06-09,RSS_News,"#MicroInfluencer #InfluencerMarketing #NanoInfluencer",1

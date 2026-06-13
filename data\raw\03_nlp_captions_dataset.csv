@@ -1,0 +1,51 @@
+post_id,platform,caption,extracted_keywords,nlp_sentiment,content_type,caption_length,hashtag_count,mention_count,word_count,has_question,has_cta,has_emoji,language
+post_001,Instagram,"Just launched our new summer collection! Swipe to see all looks. Drop a ❤️ if you love it!","['summer', 'collection', 'launched', 'looks', 'love']",0.87,image,98,5,0,17,0,1,1,en
+post_002,Instagram,"Morning motivation: You are one workout away from a good mood. Tag your gym partner 💪","['morning', 'motivation', 'workout', 'mood', 'gym', 'partner']",0.82,image,85,5,0,15,0,1,1,en
+post_003,Instagram,"Homemade pasta from scratch. 3 ingredients. 30 minutes. Pure happiness 🍝","['homemade', 'pasta', 'ingredients', 'minutes', 'happiness']",0.91,image,76,5,0,12,0,0,1,en
+post_004,Instagram,"Golden hour hits different when you have the perfect view 🌅 Where are you traveling next?","['golden', 'hour', 'perfect', 'view', 'traveling']",0.85,image,94,5,0,15,1,0,1,en
+post_005,Instagram,"New skincare routine drop! My skin has never been clearer. Full review in bio 🌿","['skincare', 'routine', 'skin', 'clearer', 'review']",0.79,image,88,5,0,14,0,1,1,en
+post_006,Instagram,"Coffee + good book + rainy day = perfect Sunday ☕📚 What are you reading?","['coffee', 'book', 'rainy', 'day', 'sunday', 'reading']",0.76,image,79,5,0,13,1,0,1,en
+post_007,Instagram,"Behind the scenes of our latest photoshoot 🎬 Hard work always pays off!","['scenes', 'photoshoot', 'hard', 'work', 'pays']",0.72,video,75,5,0,12,0,0,1,en
+post_008,Instagram,"This AI tool helped me schedule 30 posts in 10 minutes. Game changer for creators 🤖","['ai', 'tool', 'schedule', 'posts', 'minutes', 'game', 'changer', 'creators']",0.88,image,91,5,0,16,0,0,1,en
+post_009,Instagram,"Avocado toast but make it aesthetic 🥑 Recipe saved for you in highlights","['avocado', 'toast', 'aesthetic', 'recipe', 'highlights']",0.83,image,80,5,0,13,0,0,1,en
+post_010,Instagram,"Sweat now glow later ✨ 5am club is the best decision I ever made","['sweat', 'glow', '5am', 'club', 'best', 'decision']",0.77,image,71,4,0,13,0,0,1,en
+post_011,Facebook,"We just hit 100K followers! 🎉 Thank you for being part of our journey. Comment your favorite memory with us ⬇️","['100k', 'followers', 'journey', 'memory', 'community']",0.95,image,112,5,0,20,0,1,1,en
+post_012,Facebook,"Flash Sale: 50% OFF everything for the next 24 hours! Click the link in bio to shop now 🛒","['flash', 'sale', '50%', 'off', 'hours', 'shop']",0.78,image,89,5,0,16,0,1,1,en
+post_013,Facebook,"Our customer Priya just transformed her living room using our decor tips. Share your home makeover too! 🏠","['customer', 'transformed', 'living', 'room', 'decor', 'tips', 'makeover']",0.86,image,104,5,0,18,0,1,1,en
+post_014,Facebook,"Poll: Which is your go-to morning drink? ☕🍵 A) Coffee B) Tea C) Smoothie D) Water","['poll', 'morning', 'drink', 'coffee', 'tea', 'smoothie', 'water']",0.71,text,82,5,0,16,1,0,1,en
+post_015,Facebook,"10 years ago we started in a garage. Today we serve 50,000 customers. Here is our story 🚀","['years', 'garage', 'today', 'customers', 'story']",0.92,image,97,5,0,17,0,0,1,en
+post_016,Facebook,"Summer BBQ tips nobody told you about 🔥 Try method #3 and thank us later!","['summer', 'bbq', 'tips', 'method', 'later']",0.80,video,80,5,0,14,0,0,1,en
+post_017,Facebook,"Free webinar this Saturday: How to grow your Instagram to 10K followers in 90 days! Register now 👇","['free', 'webinar', 'saturday', 'instagram', '10k', 'followers', '90', 'days']",0.74,image,99,5,0,17,0,1,1,en
+post_018,Facebook,"Did you know? 70% of people trust recommendations from friends over ads. Community speaks ❤️","['70%', 'trust', 'recommendations', 'friends', 'ads', 'community']",0.83,image,94,5,0,16,0,0,1,en
+post_019,Twitter,"Hot take: scheduling your social media posts the night before saves 2 hours every day 🧵","['hot', 'take', 'scheduling', 'social', 'media', 'posts', 'saves', 'hours']",0.71,text,90,5,0,16,0,0,1,en
+post_020,Twitter,"Just discovered that posting at 8am on Tuesdays gets 3x more reach on LinkedIn 📊","['posting', '8am', 'tuesdays', '3x', 'reach', 'linkedin']",0.68,text,83,4,0,14,0,0,1,en
+post_021,Twitter,"Thread: 7 AI tools every content creator needs in 2025 (with free alternatives) 👇","['thread', 'ai', 'tools', 'content', 'creator', '2025', 'free', 'alternatives']",0.79,text,82,5,0,14,0,0,1,en
+post_022,Twitter,"Unpopular opinion: quality > quantity when it comes to social media posts. Change my mind.","['unpopular', 'opinion', 'quality', 'quantity', 'social', 'media', 'posts']",0.65,text,86,5,0,15,0,0,0,en
+post_023,Twitter,"BREAKING: Instagram changed its algorithm again. Here is what you need to do RIGHT NOW ⚡","['breaking', 'instagram', 'algorithm', 'changed', 'right', 'now']",0.73,text,84,5,0,15,0,0,1,en
+post_024,Twitter,"Real talk: The best time to post on Twitter is when your audience is actually awake 📱","['real', 'talk', 'best', 'time', 'post', 'twitter', 'audience', 'awake']",0.67,text,84,4,0,15,0,0,1,en
+post_025,Twitter,"We automated our entire social media workflow using AI and saved 15 hours per week ⬇️","['automated', 'social', 'media', 'workflow', 'ai', 'saved', '15', 'hours']",0.82,text,85,5,0,15,0,0,1,en
+post_026,LinkedIn,"5 lessons I learned after growing a brand from 0 to 500K followers in 18 months 👇","['lessons', 'learned', 'growing', 'brand', '500k', 'followers', '18', 'months']",0.85,text,85,5,0,15,0,0,1,en
+post_027,LinkedIn,"The future of marketing is AI + human creativity. Neither alone is enough.","['future', 'marketing', 'ai', 'human', 'creativity', 'enough']",0.88,image,72,5,0,13,0,0,0,en
+post_028,LinkedIn,"Hiring: We are looking for a passionate Social Media Manager who thinks in data ✉️","['hiring', 'passionate', 'social', 'media', 'manager', 'data', 'creativity']",0.72,text,91,5,0,16,0,0,1,en
+post_029,LinkedIn,"From intern to CMO in 8 years. Here are the 3 decisions that changed everything.","['intern', 'cmo', '8', 'years', 'decisions', 'changed', 'everything']",0.91,image,84,5,0,14,0,0,0,en
+post_030,LinkedIn,"Why 80% of B2B companies are wasting their LinkedIn budget. A data-backed breakdown.","['80%', 'b2b', 'companies', 'wasting', 'linkedin', 'budget', 'data']",0.77,text,84,5,0,14,0,0,0,en
+post_031,Instagram,"POV: You discover this hidden café in Bali 🌴 Would you travel 20 hours for this view?","['pov', 'hidden', 'café', 'bali', 'travel', 'hours', 'view']",0.89,reel,85,5,0,15,1,0,1,en
+post_032,Instagram,"That feeling when your order finally arrives 📦 Unboxing our limited edition kit!","['feeling', 'order', 'arrives', 'unboxing', 'limited', 'edition', 'kit']",0.84,reel,77,5,0,13,0,0,1,en
+post_033,Facebook,"Customer Spotlight: How Rahul grew his bakery from 200 to 5000 monthly orders using social media 👇","['customer', 'spotlight', 'rahul', 'bakery', 'monthly', 'orders', 'social', 'media']",0.93,image,98,5,0,16,0,0,1,en
+post_034,Twitter,"The 3am ideas are always the best ones. Anyone else? 💡","['3am', 'ideas', 'always', 'best']",0.69,text,56,5,0,10,1,0,1,en
+post_035,LinkedIn,"I reviewed 200 LinkedIn profiles of top marketers. Here is the exact pattern they follow.","['reviewed', '200', 'linkedin', 'profiles', 'marketers', 'pattern', 'follow']",0.86,text,88,5,0,15,0,0,0,en
+post_036,Instagram,"5 ingredients budget dinner that tastes like a restaurant meal 🍳 Save this for tonight!","['ingredients', 'budget', 'dinner', 'restaurant', 'meal', 'save']",0.81,image,82,5,0,14,0,1,1,en
+post_037,Instagram,"This one caption template gets me 300 comments every single time. Screenshot this 📸","['caption', 'template', '300', 'comments', 'time', 'screenshot']",0.87,image,82,5,0,14,0,1,1,en
+post_038,Facebook,"It is okay to take a break. Mental health matters more than content consistency 💚","['okay', 'break', 'mental', 'health', 'matters', 'content', 'consistency']",0.94,image,80,5,0,14,0,0,1,en
+post_039,Twitter,"Data thread: I analyzed 1000 viral tweets. Here are the 6 patterns every one had in common 🧵","['data', 'thread', 'analyzed', '1000', 'viral', 'tweets', 'patterns', 'common']",0.84,text,90,5,0,16,0,0,1,en
+post_040,LinkedIn,"Rejected from 30 companies before landing my dream job at Google. What I learned from every no.","['rejected', '30', 'companies', 'dream', 'job', 'google', 'learned']",0.96,text,88,5,0,16,0,0,0,en
+post_041,Instagram,"Monday energy check: Drop your mood in the comments 🔥😴😊","['monday', 'energy', 'check', 'mood', 'comments']",0.73,image,59,4,0,10,0,1,1,en
+post_042,Instagram,"This reel took 6 hours to make. 30 seconds of video. Was it worth it? You tell me 🎬","['reel', '6', 'hours', '30', 'seconds', 'video', 'worth']",0.80,reel,84,5,0,16,1,0,1,en
+post_043,Facebook,"GIVEAWAY 🎁 Win our premium content creator kit worth ₹15000! Follow. Like. Tag 2 friends.","['giveaway', 'win', 'premium', 'content', 'creator', 'kit', '₹15000']",0.77,image,88,4,0,15,0,1,1,en
+post_044,Twitter,"Nobody talks about the loneliness of building something from scratch. Today I want to. A thread 🧵","['loneliness', 'building', 'scratch', 'thread', 'nobody', 'talks']",0.83,text,92,5,0,16,0,0,1,en
+post_045,LinkedIn,"The LinkedIn algorithm rewards consistency above everything. Proof from my last 90 days 📊","['linkedin', 'algorithm', 'rewards', 'consistency', 'proof', '90', 'days']",0.88,image,86,5,0,14,0,0,1,en
+post_046,Instagram,"POV: Monday but you have your planner sorted 📓 Shop link in bio for 20% off today!","['pov', 'monday', 'planner', 'sorted', 'shop', '20%', 'off']",0.75,image,81,5,0,14,0,1,1,en
+post_047,Instagram,"We hit 500K! Could not have done this without every single one of you 🤍 Giveaway coming soon!","['500k', 'done', 'every', 'one', 'giveaway', 'coming', 'soon']",0.96,image,88,4,0,16,0,0,1,en
+post_048,Facebook,"What do you wish you knew before starting your business? Drop your wisdom in comments 👇","['wish', 'knew', 'starting', 'business', 'wisdom', 'comments']",0.79,text,85,5,0,15,1,1,1,en
+post_049,Twitter,"If your brand had a personality it would be... describe it in 3 words. Go 👇","['brand', 'personality', '3', 'words', 'describe']",0.71,text,73,4,0,14,0,1,1,en
+post_050,LinkedIn,"Here is the exact email I sent to land a $50K client. No fluff. Just the real template 📧","['exact', 'email', 'land', '$50k', 'client', 'fluff', 'template']",0.89,text,85,4,0,16,0,0,1,en

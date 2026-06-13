@@ -1,0 +1,16 @@
+user_id,username,email,role,brand_name,created_at,last_login,is_active,total_posts_created,total_posts_published,avg_engagement_score,preferred_platform,preferred_tone
+usr001,admin_techcreate,admin@techcreate.io,admin,TechCreate,2025-01-15 09:00:00,2025-06-15 08:34:12,1,234,198,72.4,Instagram,engaging
+usr002,editor_techcreate,content@techcreate.io,editor,TechCreate,2025-02-01 10:00:00,2025-06-15 11:22:45,1,187,156,68.9,Twitter,professional
+usr003,viewer_techcreate,analyst@techcreate.io,viewer,TechCreate,2025-03-10 14:00:00,2025-06-14 16:45:23,1,0,0,0.0,LinkedIn,professional
+usr004,admin_growthlb,admin@growthlab.in,admin,GrowthLab,2025-01-10 09:00:00,2025-06-15 09:12:34,1,312,289,81.3,LinkedIn,professional
+usr005,editor_growthlb,content@growthlab.in,editor,GrowthLab,2025-02-15 10:00:00,2025-06-15 10:44:18,1,245,213,76.8,LinkedIn,professional
+usr006,admin_styleco,admin@styleco.in,admin,StyleCo,2025-01-20 09:00:00,2025-06-15 07:56:23,1,178,167,69.2,Instagram,playful
+usr007,editor_styleco,content@styleco.in,editor,StyleCo,2025-03-05 10:00:00,2025-06-15 12:34:56,1,134,126,65.7,Instagram,playful
+usr008,admin_tasteblog,admin@tasteblog.com,admin,TasteBlog,2025-02-05 09:00:00,2025-06-15 08:23:11,1,156,148,74.1,Instagram,friendly
+usr009,admin_brandx,admin@brandx.com,admin,BrandX,2025-01-25 09:00:00,2025-06-15 09:45:37,1,267,251,77.8,Facebook,inspiring
+usr010,admin_glowup,admin@glowup.in,admin,GlowUp,2025-03-15 09:00:00,2025-06-14 18:23:45,1,89,82,71.3,Instagram,friendly
+usr011,admin_fitlife,admin@fitlife.in,admin,FitLife,2025-02-20 09:00:00,2025-06-15 06:12:34,1,123,115,67.4,Instagram,motivational
+usr012,editor_wanderlens,content@wanderlens.in,editor,WanderLens,2025-04-01 10:00:00,2025-06-13 14:23:56,1,67,63,78.9,Instagram,inspiring
+usr013,admin_wellbeing,admin@wellbeinghub.in,admin,WellBeingHub,2025-03-20 09:00:00,2025-06-15 10:34:12,1,45,43,83.2,Facebook,empathetic
+usr014,admin_plannrco,admin@plannerco.in,admin,PlannerCo,2025-04-10 09:00:00,2025-06-12 15:45:23,1,34,32,62.8,Instagram,playful
+usr015,admin_brewbooks,admin@brewbooks.in,admin,BrewBooks,2025-04-20 09:00:00,2025-06-11 11:23:45,1,28,26,58.4,Instagram,cozy

@@ -1,0 +1,34 @@
+[
+  {
+    "platform": "Facebook",
+    "day_of_week": "Saturday",
+    "hour_posted": 11,
+    "avg_engagement_rate": 0.1415,
+    "best_content_type": "image",
+    "peak_score": 91.2
+  },
+  {
+    "platform": "Instagram",
+    "day_of_week": "Wednesday",
+    "hour_posted": 20,
+    "avg_engagement_rate": 0.1023,
+    "best_content_type": "image",
+    "peak_score": 88.6
+  },
+  {
+    "platform": "LinkedIn",
+    "day_of_week": "Monday",
+    "hour_posted": 8,
+    "avg_engagement_rate": 0.0784,
+    "best_content_type": "text",
+    "peak_score": 87.4
+  },
+  {
+    "platform": "Twitter",
+    "day_of_week": "Monday",
+    "hour_posted": 9,
+    "avg_engagement_rate": 0.1033,
+    "best_content_type": "text",
+    "peak_score": 74.1
+  }
+]
