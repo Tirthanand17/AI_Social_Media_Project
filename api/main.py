@@ -1,6 +1,9 @@
+import os
 import sys
 from pathlib import Path
 from typing import Optional, List
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -8,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(ROOT / ".env")
 FRONTEND_DIR = ROOT / "frontend"
 for p in [ROOT, ROOT / "nlp", ROOT / "ml_models", ROOT / "api", ROOT / "scheduler", ROOT / "publisher"]:
     sys.path.append(str(p))
@@ -30,11 +34,23 @@ from publisher_manager import publish_post, integration_status
 from notifier import send_telegram
 from content_intelligence import content_brief, dataset_overview
 
-app = FastAPI(title="AI Social Media Automation API", version="1.0.0")
+
+def _allowed_origins() -> list[str]:
+    raw_origins = os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://127.0.0.1:8010,http://localhost:8010,http://127.0.0.1:8501,http://localhost:8501",
+    )
+    origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+    return origins or ["http://127.0.0.1:8010"]
+
+
+allowed_origins = _allowed_origins()
+
+app = FastAPI(title="AI Social Media Automation API", version="1.1.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=allowed_origins,
+    allow_credentials=allowed_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -81,13 +97,6 @@ class ABRequest(BaseModel):
     caption_a: str
     caption_b: str
     platform: str = "Instagram"
-    content_type: str = "reel"
-    day_of_week: str = "Friday"
-    hour_posted: int = 19
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
 
 class PublishRequest(BaseModel):
     platform: str
@@ -95,164 +104,155 @@ class PublishRequest(BaseModel):
     media_url: Optional[str] = None
 
 class TelegramRequest(BaseModel):
-    message: str = "AI Social Media Automation test message"
+    message: str
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 @app.get("/")
-def home():
-    return {
-        "status": "running",
-        "project": "AI Social Media Automation",
-        "mode": "free prototype with optional Gemini + local fallback",
-        "frontend": "/app",
-        "docs": "/docs",
-    }
+def root():
+    return {"message": "AI Social Media Automation API", "docs": "/docs", "frontend": "/app"}
 
-@app.get("/app", include_in_schema=False)
-def frontend_app():
+@app.get("/app")
+def frontend():
     return FileResponse(FRONTEND_DIR / "index.html")
 
 @app.get("/api/health")
 def health():
-    return home()
+    return {
+        "status": "ok",
+        "service": "AI Social Media Automation",
+        "version": app.version,
+        "posting_mode": os.getenv("POSTING_MODE", "dry_run"),
+    }
 
-@app.post("/api/auth/login")
+@app.get("/api/config")
+def public_config():
+    return {
+        "posting_mode": os.getenv("POSTING_MODE", "dry_run"),
+        "demo_login_enabled": os.getenv("DEMO_LOGIN_ENABLED", "true").lower() in {"1", "true", "yes", "on"},
+        "allowed_origins": allowed_origins,
+    }
+
+@app.post("/api/login")
 def api_login(req: LoginRequest):
     return login(req.username, req.password)
 
-@app.post("/api/content/generate-caption")
+@app.post("/api/generate-caption")
 def api_caption(req: CaptionRequest):
-    return {"caption": generate_caption(req.topic, req.platform, req.tone)}
+    return {"captions": generate_caption(req.topic, req.platform, req.tone)}
 
-@app.post("/api/content/generate-multiple-captions")
-def api_multi_caption(req: MultipleCaptionRequest):
-    return {"captions": generate_multiple_captions(req.topic, req.count, req.platform)}
+@app.post("/api/generate-multiple-captions")
+def api_multiple_captions(req: MultipleCaptionRequest):
+    return {"captions": generate_multiple_captions(req.topic, req.platform, req.count)}
 
-@app.post("/api/content/hashtags")
+@app.post("/api/hashtags")
 def api_hashtags(req: TextRequest):
     return hashtag_strategy(req.text, req.platform)
 
-@app.post("/api/content/keywords")
+@app.post("/api/keywords")
 def api_keywords(req: TextRequest):
     return keyword_analysis(req.text)
 
-@app.get("/api/trends/analyze")
-def api_trends(platform: Optional[str] = None):
-    res = analyze_trends(20, platform)
-    if res.get("status") == "success":
-        res["content_ideas"] = suggest_content_ideas(res["trending_keywords"], 5)
-    return res
+@app.get("/api/trends")
+def api_trends(platform: str = "Instagram"):
+    return analyze_trends(platform)
 
-@app.post("/api/content/moderate")
+@app.get("/api/content-ideas")
+def api_ideas(platform: str = "Instagram", niche: str = "AI"):
+    return {"ideas": suggest_content_ideas(platform, niche)}
+
+@app.post("/api/moderate")
 def api_moderate(req: TextRequest):
     return moderate_text(req.text)
 
-@app.post("/api/content/plagiarism")
+@app.post("/api/plagiarism")
 def api_plagiarism(req: TextRequest):
     return check_plagiarism(req.text)
 
-@app.post("/api/content/translate")
+@app.post("/api/translate")
 def api_translate(req: TranslateRequest):
     return translate_caption(req.text, req.target_language)
 
-@app.post("/api/content/image-prompt")
-def api_image_prompt(req: CaptionRequest):
-    return generate_prompt_package(req.topic, req.platform)
+@app.post("/api/image-prompt")
+def api_image(req: CaptionRequest):
+    return generate_prompt_package(req.topic, req.platform, req.tone)
 
-@app.post("/api/ml/predict-engagement")
+@app.post("/api/predict-engagement")
 def api_predict(req: PredictionRequest):
     return predict_engagement(req.dict())
 
-@app.post("/api/ml/ab-test")
+@app.post("/api/ab-test")
 def api_ab(req: ABRequest):
-    return compare_two_captions(req.caption_a, req.caption_b, req.platform, req.content_type, req.day_of_week, req.hour_posted)
+    return compare_two_captions(req.caption_a, req.caption_b, req.platform)
 
-@app.get("/api/ml/ab-insights")
-def api_ab_insights():
-    return {"insights": historical_ab_insights()}
+@app.get("/api/ab-history")
+def api_ab_history(platform: str = "Instagram"):
+    return historical_ab_insights(platform)
 
-@app.get("/api/analytics/summary")
-def api_analytics(platform: Optional[str] = None):
+@app.get("/api/analytics")
+def api_analytics(platform: str = "Instagram"):
     return analytics_summary(platform)
 
-@app.get("/api/competitors/summary")
-def api_competitors():
-    return competitor_summary()
+@app.get("/api/competitors")
+def api_competitors(platform: str = "Instagram"):
+    return competitor_summary(platform)
 
-@app.get("/api/scheduler/summary")
-def api_scheduler():
-    return scheduler_summary()
+@app.get("/api/scheduler")
+def api_scheduler(platform: str = "Instagram"):
+    return scheduler_summary(platform)
 
-@app.get("/api/scheduler/best-time")
-def api_best_time(platform: str = "Instagram"):
-    return recommend_best_time(platform)
+@app.get("/api/best-time")
+def api_best_time(platform: str = "Instagram", content_type: str = "reel"):
+    return recommend_best_time(platform, content_type)
 
-@app.post("/api/publisher/dry-run")
-def api_publish(req: PublishRequest):
-    return publish_post(req.platform, req.caption, req.media_url, dry_run=True)
-
-@app.post("/api/publisher/live")
-def api_publish_live(req: PublishRequest):
-    return publish_post(req.platform, req.caption, req.media_url, dry_run=False)
-
-@app.get("/api/integrations/status")
+@app.get("/api/integrations")
 def api_integrations():
     return integration_status()
 
-@app.get("/api/data/overview")
-def api_data_overview():
-    return {"datasets": dataset_overview()}
+@app.post("/api/publish")
+def api_publish(req: PublishRequest):
+    return publish_post(req.platform, req.caption, req.media_url)
 
-@app.get("/api/content/brief")
-def api_content_brief(platform: str = "Instagram"):
-    return content_brief(platform)
+@app.post("/api/telegram")
+def api_telegram(req: TelegramRequest):
+    return send_telegram(req.message)
 
-@app.post("/api/content/raw-to-post")
-def api_raw_to_post(req: RawToPostRequest):
-    brief = content_brief(req.platform)
-    raw_summary = " ".join(req.raw_text.split())[:700]
-    trend_context = ", ".join(brief.get("top_trends") or []) or brief.get("topic_seed", "")
-    topic = f"{req.campaign_goal}. Raw context: {raw_summary}. Use trends: {trend_context}"
-    caption = generate_caption(topic, req.platform, req.tone)
-    hashtags = hashtag_strategy(caption, req.platform)
-    moderation = moderate_text(caption)
-    plagiarism = check_plagiarism(caption)
-    image_prompt = generate_prompt_package(topic, req.platform)
-    best_time = recommend_best_time(req.platform)
+@app.get("/api/dataset-overview")
+def api_dataset_overview():
+    return dataset_overview()
+
+@app.post("/api/content-brief")
+def api_content_brief(req: RawToPostRequest):
+    return content_brief(req.raw_text, req.platform, req.tone)
+
+@app.post("/api/full-pipeline")
+def api_full_pipeline(req: RawToPostRequest):
+    caption = generate_caption(req.raw_text, req.platform, req.tone)
+    caption_text = caption[0]["caption"] if isinstance(caption, list) else str(caption)
+    hashtags = hashtag_strategy(caption_text, req.platform)
+    moderation = moderate_text(caption_text)
+    plagiarism = check_plagiarism(caption_text)
     prediction = predict_engagement({
         "platform": req.platform,
-        "content_type": (best_time or {}).get("best_content_type", "reel"),
-        "day_of_week": (best_time or {}).get("day_of_week", "Friday"),
-        "hour_posted": int((best_time or {}).get("hour_posted", 19)),
-        "caption": caption,
-        "hashtags": hashtags.get("hashtag_string", ""),
+        "content_type": "reel",
+        "day_of_week": "Friday",
+        "hour_posted": 19,
+        "caption": caption_text,
+        "hashtags": " ".join(hashtags.get("recommended_hashtags", [])),
         "sentiment_score": 0.7,
         "has_image": 1,
     })
-    publish_preview = publish_post(req.platform, caption, req.media_url, dry_run=True)
+    schedule = recommend_best_time(req.platform, "reel")
+    brief = content_brief(req.raw_text, req.platform, req.tone)
     return {
-        "platform": req.platform,
-        "campaign_goal": req.campaign_goal,
         "caption": caption,
         "hashtags": hashtags,
         "moderation": moderation,
         "plagiarism": plagiarism,
-        "image_prompt": image_prompt,
-        "best_time": best_time,
         "engagement_prediction": prediction,
-        "publish_preview": publish_preview,
-        "raw_data_brief": brief,
+        "recommended_schedule": schedule,
+        "content_brief": brief,
+        "note": "Publishing remains dry-run unless POSTING_MODE=live and platform credentials are configured.",
     }
-
-@app.post("/api/integrations/telegram/send")
-def api_telegram_send(req: TelegramRequest):
-    return send_telegram(req.message)
-
-@app.post("/api/content/full-pipeline")
-def api_full_pipeline(req: CaptionRequest):
-    caption = generate_caption(req.topic, req.platform, req.tone)
-    hashtags = hashtag_strategy(caption, req.platform)
-    moderation = moderate_text(caption)
-    plagiarism = check_plagiarism(caption)
-    image_prompt = generate_prompt_package(req.topic, req.platform)
-    prediction = predict_engagement({"platform": req.platform, "content_type": "reel", "day_of_week": "Friday", "hour_posted": 19, "caption": caption, "hashtags": hashtags["hashtag_string"], "sentiment_score": 0.7, "has_image": 1})
-    return {"caption": caption, "hashtags": hashtags, "moderation": moderation, "plagiarism": plagiarism, "image_prompt": image_prompt, "engagement_prediction": prediction}
