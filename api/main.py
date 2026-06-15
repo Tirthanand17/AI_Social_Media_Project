@@ -26,7 +26,9 @@ from analytics_fetcher import analytics_summary
 from competitor_tracker import competitor_summary
 from auth import login
 from auto_scheduler import scheduler_summary, recommend_best_time
-from publisher_manager import publish_post
+from publisher_manager import publish_post, integration_status
+from notifier import send_telegram
+from content_intelligence import content_brief, dataset_overview
 
 app = FastAPI(title="AI Social Media Automation API", version="1.0.0")
 app.add_middleware(
@@ -44,6 +46,13 @@ class CaptionRequest(BaseModel):
     topic: str
     platform: str = "Instagram"
     tone: str = "engaging"
+
+class RawToPostRequest(BaseModel):
+    raw_text: str
+    platform: str = "Instagram"
+    tone: str = "professional"
+    campaign_goal: str = "Grow engagement"
+    media_url: Optional[str] = None
 
 class MultipleCaptionRequest(BaseModel):
     topic: str
@@ -84,6 +93,9 @@ class PublishRequest(BaseModel):
     platform: str
     caption: str
     media_url: Optional[str] = None
+
+class TelegramRequest(BaseModel):
+    message: str = "AI Social Media Automation test message"
 
 @app.get("/")
 def home():
@@ -177,6 +189,63 @@ def api_best_time(platform: str = "Instagram"):
 @app.post("/api/publisher/dry-run")
 def api_publish(req: PublishRequest):
     return publish_post(req.platform, req.caption, req.media_url, dry_run=True)
+
+@app.post("/api/publisher/live")
+def api_publish_live(req: PublishRequest):
+    return publish_post(req.platform, req.caption, req.media_url, dry_run=False)
+
+@app.get("/api/integrations/status")
+def api_integrations():
+    return integration_status()
+
+@app.get("/api/data/overview")
+def api_data_overview():
+    return {"datasets": dataset_overview()}
+
+@app.get("/api/content/brief")
+def api_content_brief(platform: str = "Instagram"):
+    return content_brief(platform)
+
+@app.post("/api/content/raw-to-post")
+def api_raw_to_post(req: RawToPostRequest):
+    brief = content_brief(req.platform)
+    raw_summary = " ".join(req.raw_text.split())[:700]
+    trend_context = ", ".join(brief.get("top_trends") or []) or brief.get("topic_seed", "")
+    topic = f"{req.campaign_goal}. Raw context: {raw_summary}. Use trends: {trend_context}"
+    caption = generate_caption(topic, req.platform, req.tone)
+    hashtags = hashtag_strategy(caption, req.platform)
+    moderation = moderate_text(caption)
+    plagiarism = check_plagiarism(caption)
+    image_prompt = generate_prompt_package(topic, req.platform)
+    best_time = recommend_best_time(req.platform)
+    prediction = predict_engagement({
+        "platform": req.platform,
+        "content_type": (best_time or {}).get("best_content_type", "reel"),
+        "day_of_week": (best_time or {}).get("day_of_week", "Friday"),
+        "hour_posted": int((best_time or {}).get("hour_posted", 19)),
+        "caption": caption,
+        "hashtags": hashtags.get("hashtag_string", ""),
+        "sentiment_score": 0.7,
+        "has_image": 1,
+    })
+    publish_preview = publish_post(req.platform, caption, req.media_url, dry_run=True)
+    return {
+        "platform": req.platform,
+        "campaign_goal": req.campaign_goal,
+        "caption": caption,
+        "hashtags": hashtags,
+        "moderation": moderation,
+        "plagiarism": plagiarism,
+        "image_prompt": image_prompt,
+        "best_time": best_time,
+        "engagement_prediction": prediction,
+        "publish_preview": publish_preview,
+        "raw_data_brief": brief,
+    }
+
+@app.post("/api/integrations/telegram/send")
+def api_telegram_send(req: TelegramRequest):
+    return send_telegram(req.message)
 
 @app.post("/api/content/full-pipeline")
 def api_full_pipeline(req: CaptionRequest):
