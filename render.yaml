@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ai-social-media-automation-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: POSTING_MODE
+        value: dry_run
+      - key: DEMO_LOGIN_ENABLED
+        value: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: APP_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: EDITOR_PASSWORD
+        sync: false
+      - key: VIEWER_PASSWORD
+        sync: false
+      - key: USE_GEMINI
+        value: false
+      - key: USE_GROQ
+        value: false
