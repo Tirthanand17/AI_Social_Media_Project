@@ -1,5 +1,7 @@
+import csv
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -13,6 +15,7 @@ from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 FRONTEND_DIR = ROOT / "frontend"
+FEEDBACK_FILE = ROOT / "data" / "processed" / "feedback_loop.csv"
 
 for p in [ROOT, ROOT / "nlp", ROOT / "ml_models", ROOT / "api", ROOT / "scheduler", ROOT / "publisher"]:
     sys.path.append(str(p))
@@ -34,6 +37,8 @@ from auto_scheduler import scheduler_summary, recommend_best_time
 from publisher_manager import publish_post, integration_status
 from notifier import send_telegram
 from content_intelligence import content_brief, dataset_overview
+from feedback_loop import build_prompt_improvements
+from trained_analyser import analyse_content
 
 
 def _allowed_origins() -> list[str]:
@@ -76,9 +81,60 @@ def _safe_step(name, func, fallback=None):
         return fallback if fallback is not None else {"status": "error", "step": name, "message": str(exc)}
 
 
+def _read_feedback_rows():
+    if not FEEDBACK_FILE.exists():
+        return []
+    with FEEDBACK_FILE.open("r", encoding="utf-8", newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def _save_feedback_record(platform, caption, rating, notes="", actual_engagement=None):
+    FEEDBACK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    rows = _read_feedback_rows()
+    fieldnames = ["feedback_id", "created_at", "platform", "caption", "rating", "actual_engagement", "notes"]
+    row = {
+        "feedback_id": f"fb{len(rows) + 1:04d}",
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "platform": platform,
+        "caption": str(caption)[:1000],
+        "rating": str(max(1, min(5, int(rating)))),
+        "actual_engagement": "" if actual_engagement is None else str(actual_engagement),
+        "notes": notes,
+    }
+    rows.append(row)
+    with FEEDBACK_FILE.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    return {"status": "saved", "feedback": row, "total_feedback": len(rows)}
+
+
+def _feedback_summary():
+    rows = _read_feedback_rows()
+    ratings = []
+    for row in rows:
+        try:
+            ratings.append(float(row.get("rating", 0)))
+        except Exception:
+            pass
+    avg = round(sum(ratings) / len(ratings), 2) if ratings else None
+    by_platform = {}
+    for row in rows:
+        platform = row.get("platform") or "Unknown"
+        by_platform.setdefault(platform, []).append(float(row.get("rating") or 0))
+    by_platform_avg = {platform: round(sum(values) / len(values), 2) for platform, values in by_platform.items() if values}
+    return {
+        "total_feedback": len(rows),
+        "average_rating": avg,
+        "by_platform": by_platform_avg,
+        "recent_feedback": rows[-8:],
+        "prompt_improvements": _safe_step("prompt_improvements", build_prompt_improvements, {}),
+    }
+
+
 allowed_origins = _allowed_origins()
 
-app = FastAPI(title="AI Social Media Automation API", version="1.2.1")
+app = FastAPI(title="AI Social Media Automation API", version="1.3.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -151,6 +207,23 @@ class TelegramRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+
+class FeedbackRequest(BaseModel):
+    platform: str = "Instagram"
+    caption: str
+    rating: int = 5
+    notes: str = ""
+    actual_engagement: Optional[float] = None
+
+
+class TrainedAnalyserRequest(BaseModel):
+    caption: str
+    platform: str = "Instagram"
+    content_type: str = "reel"
+    day_of_week: str = "Friday"
+    hour_posted: int = 19
+    hashtags: str = "#AI #SocialMedia"
 
 
 @app.get("/")
@@ -245,12 +318,14 @@ def api_plagiarism(req: TextRequest):
 
 
 @app.post("/api/translate")
+@app.post("/api/multilingual/translate")
 def api_translate(req: TranslateRequest):
     return translate_caption(req.text, req.target_language)
 
 
 @app.post("/api/image-prompt")
 @app.post("/api/content/image-prompt")
+@app.post("/api/image-generator")
 def api_image(req: CaptionRequest):
     return generate_prompt_package(req.topic, req.platform)
 
@@ -259,6 +334,12 @@ def api_image(req: CaptionRequest):
 @app.post("/api/ml/predict-engagement")
 def api_predict(req: PredictionRequest):
     return predict_engagement(req.dict())
+
+
+@app.post("/api/trained-analyser")
+@app.post("/api/trained-analyzer")
+def api_trained_analyser(req: TrainedAnalyserRequest):
+    return analyse_content(req.caption, req.platform, req.content_type, req.day_of_week, req.hour_posted, req.hashtags)
 
 
 @app.post("/api/ab-test")
@@ -322,6 +403,18 @@ def api_content_brief_post(req: RawToPostRequest):
     return content_brief(req.platform)
 
 
+@app.post("/api/feedback")
+@app.post("/api/feedback-loop")
+def api_feedback(req: FeedbackRequest):
+    return _save_feedback_record(req.platform, req.caption, req.rating, req.notes, req.actual_engagement)
+
+
+@app.get("/api/feedback")
+@app.get("/api/feedback-loop")
+def api_feedback_summary():
+    return _feedback_summary()
+
+
 def build_post_package(req: RawToPostRequest):
     captions = _safe_step("caption", lambda: generate_caption(req.raw_text, req.platform, req.tone), "")
     caption_text = _caption_text(captions) if captions else req.raw_text
@@ -341,6 +434,8 @@ def build_post_package(req: RawToPostRequest):
         "has_image": 1,
     }))
     publish_preview = _safe_step("publish_preview", lambda: publish_post(req.platform, caption_text, req.media_url))
+    translated = _safe_step("multilingual", lambda: translate_caption(caption_text, "Hindi"))
+    analyser = _safe_step("trained_analyser", lambda: analyse_content(caption_text, req.platform, "reel", str((best_time or {}).get("day_of_week", "Friday")), int((best_time or {}).get("hour_posted", 19)), _hashtag_string(hashtags)))
     return {
         "platform": req.platform,
         "campaign_goal": req.campaign_goal,
@@ -352,6 +447,8 @@ def build_post_package(req: RawToPostRequest):
         "image_prompt": image_prompt,
         "engagement_prediction": prediction,
         "best_time": best_time,
+        "multilingual_preview": translated,
+        "trained_analyser": analyser,
         "content_brief": _safe_step("content_brief", lambda: content_brief(req.platform)),
         "publish_preview": publish_preview,
         "note": "Publishing remains dry-run unless POSTING_MODE=live and platform credentials are configured.",
