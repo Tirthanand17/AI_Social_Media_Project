@@ -1,0 +1,1 @@
+const reviewUrl = '/api/feedback';
