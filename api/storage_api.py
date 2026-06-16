@@ -3,7 +3,22 @@ from typing import Optional
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from database_manager import init_db, list_posts, save_post, get_post, update_post, list_users, dashboard_charts, list_schedules, schedule_post, submit_for_approval, approve_post
+from database_manager import (
+    init_db,
+    list_posts,
+    save_post,
+    get_post,
+    update_post,
+    list_users,
+    dashboard_charts,
+    list_schedules,
+    schedule_post,
+    submit_for_approval,
+    approve_post,
+    save_feedback,
+    list_feedback,
+    list_activity,
+)
 
 router = APIRouter(prefix="/api/db", tags=["SQLite workspace"])
 
@@ -52,6 +67,16 @@ class ApprovalRequest(BaseModel):
     approved_by: str = "admin_techcreate"
     approved: bool = True
     reason: str = ""
+
+
+class ReviewRequest(BaseModel):
+    post_id: Optional[int] = None
+    platform: str = "Instagram"
+    caption: str = ""
+    rating: int = 5
+    notes: str = ""
+    actual_engagement: Optional[float] = None
+    created_by: str = "editor_creator"
 
 
 @router.get("/init")
@@ -132,6 +157,26 @@ def db_reschedule_by_id(post_id: int, req: RescheduleRequest):
 @router.get("/schedules")
 def db_schedules(limit: int = 50):
     return {"schedules": list_schedules(limit)}
+
+
+@router.post("/review")
+def db_save_review(req: ReviewRequest):
+    if not req.caption.strip() and req.post_id:
+        post = get_post(req.post_id)
+        req.caption = post.get("caption", "")
+        req.platform = post.get("platform", req.platform)
+    saved = save_feedback(req.post_id, req.platform, req.caption, req.rating, req.notes, req.actual_engagement, req.created_by)
+    return {"status": "success", "message": "Feedback saved", "review": saved}
+
+
+@router.get("/reviews")
+def db_reviews(limit: int = 50):
+    return {"reviews": list_feedback(limit)}
+
+
+@router.get("/activity")
+def db_activity(limit: int = 80):
+    return {"activity": list_activity(limit)}
 
 
 @router.get("/charts")
