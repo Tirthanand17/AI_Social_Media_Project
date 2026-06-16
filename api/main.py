@@ -8,7 +8,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -42,10 +42,7 @@ from trained_analyser import analyse_content
 
 
 def _allowed_origins() -> list[str]:
-    raw_origins = os.getenv(
-        "ALLOWED_ORIGINS",
-        "http://127.0.0.1:8010,http://localhost:8010,http://127.0.0.1:8501,http://localhost:8501",
-    )
+    raw_origins = os.getenv("ALLOWED_ORIGINS", "http://127.0.0.1:8010,http://localhost:8010,http://127.0.0.1:8501,http://localhost:8501")
     origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
     return origins or ["http://127.0.0.1:8010"]
 
@@ -123,25 +120,13 @@ def _feedback_summary():
         platform = row.get("platform") or "Unknown"
         by_platform.setdefault(platform, []).append(float(row.get("rating") or 0))
     by_platform_avg = {platform: round(sum(values) / len(values), 2) for platform, values in by_platform.items() if values}
-    return {
-        "total_feedback": len(rows),
-        "average_rating": avg,
-        "by_platform": by_platform_avg,
-        "recent_feedback": rows[-8:],
-        "prompt_improvements": _safe_step("prompt_improvements", build_prompt_improvements, {}),
-    }
+    return {"total_feedback": len(rows), "average_rating": avg, "by_platform": by_platform_avg, "recent_feedback": rows[-8:], "prompt_improvements": _safe_step("prompt_improvements", build_prompt_improvements, {})}
 
 
 allowed_origins = _allowed_origins()
 
-app = FastAPI(title="AI Social Media Automation API", version="1.3.0")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=allowed_origins != ["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title="AI Social Media Automation API", version="1.3.1")
+app.add_middleware(CORSMiddleware, allow_origins=allowed_origins, allow_credentials=allowed_origins != ["*"], allow_methods=["*"], allow_headers=["*"])
 
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
@@ -228,7 +213,7 @@ class TrainedAnalyserRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "AI Social Media Automation API", "docs": "/docs", "frontend": "/app"}
+    return {"message": "AI Social Media Automation API", "docs": "/docs", "frontend": "/app", "feature_tools": "/app/feature-tools"}
 
 
 @app.get("/app")
@@ -236,23 +221,21 @@ def frontend():
     return FileResponse(FRONTEND_DIR / "index.html", headers={"Cache-Control": "no-store"})
 
 
+@app.get("/app/feature-tools", response_class=HTMLResponse)
+def feature_tools():
+    return """
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>AI Social Studio Feature Tools</title><style>body{font-family:Segoe UI,Arial;margin:0;background:#f6f8fb;color:#101828}.wrap{max-width:1100px;margin:auto;padding:28px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:white;border:1px solid #e4e7ec;border-radius:18px;padding:20px;box-shadow:0 16px 38px rgba(16,24,40,.06)}input,select,textarea{width:100%;padding:10px;margin:8px 0 12px;border:1px solid #d0d5dd;border-radius:10px}button{background:#2251ff;color:white;border:0;border-radius:10px;padding:11px 16px;font-weight:800}a{color:#2251ff}.note{background:#eef3ff;padding:14px;border-radius:14px}@media(max-width:800px){.grid{grid-template-columns:1fr}}</style></head><body><div class='wrap'><h1>AI Social Studio feature tools</h1><p class='note'>These browser forms are connected with the backend APIs. Submit any form to test the feature output as JSON.</p><p><a href='/app'>Back to main app</a> | <a href='/docs'>Open API docs</a></p><div class='grid'><form class='card' action='/api/multilingual/translate-demo' method='get'><h2>Multilingual</h2><textarea name='text'>AI automation helps creators save time #AI</textarea><select name='target_language'><option>Hindi</option><option>Marathi</option><option>Spanish</option></select><button>Translate</button></form><form class='card' action='/api/image-generator-demo' method='get'><h2>Image generator</h2><textarea name='topic'>AI social media automation dashboard for creators</textarea><select name='platform'><option>Instagram</option><option>Facebook</option><option>Twitter</option><option>LinkedIn</option></select><button>Generate prompt package</button></form><form class='card' action='/api/trained-analyser-demo' method='get'><h2>Trained analyser</h2><textarea name='caption'>AI automation helps creators plan and publish better posts.</textarea><input name='hashtags' value='#AI #Automation #SocialMedia'><select name='platform'><option>Instagram</option><option>Facebook</option><option>Twitter</option><option>LinkedIn</option></select><button>Analyse content</button></form><form class='card' action='/api/review-demo' method='get'><h2>Review loop</h2><textarea name='caption'>AI automation test caption #AI</textarea><input name='rating' type='number' min='1' max='5' value='5'><input name='notes' value='Good hook and CTA'><select name='platform'><option>Instagram</option><option>Facebook</option><option>Twitter</option><option>LinkedIn</option></select><button>Save rating</button></form><form class='card' action='/api/publisher-demo' method='get'><h2>Publisher manager</h2><textarea name='caption'>AI automation test caption #AI</textarea><select name='platform'><option>Instagram</option><option>Facebook</option><option>Twitter</option><option>LinkedIn</option></select><button>Dry-run publish</button></form><form class='card' action='/api/feedback' method='get'><h2>Review summary</h2><p>Load saved ratings and recommendations.</p><button>Load summary</button></form></div></div></body></html>
+"""
+
+
 @app.get("/api/health")
 def health():
-    return {
-        "status": "ok",
-        "service": "AI Social Media Automation",
-        "version": app.version,
-        "posting_mode": os.getenv("POSTING_MODE", "dry_run"),
-    }
+    return {"status": "ok", "service": "AI Social Media Automation", "version": app.version, "posting_mode": os.getenv("POSTING_MODE", "dry_run")}
 
 
 @app.get("/api/config")
 def public_config():
-    return {
-        "posting_mode": os.getenv("POSTING_MODE", "dry_run"),
-        "demo_login_enabled": os.getenv("DEMO_LOGIN_ENABLED", "true").lower() in {"1", "true", "yes", "on"},
-        "allowed_origins": allowed_origins,
-    }
+    return {"posting_mode": os.getenv("POSTING_MODE", "dry_run"), "demo_login_enabled": os.getenv("DEMO_LOGIN_ENABLED", "true").lower() in {"1", "true", "yes", "on"}, "allowed_origins": allowed_origins}
 
 
 @app.post("/api/login")
@@ -323,11 +306,21 @@ def api_translate(req: TranslateRequest):
     return translate_caption(req.text, req.target_language)
 
 
+@app.get("/api/multilingual/translate-demo")
+def api_translate_demo(text: str = "AI automation helps creators save time #AI", target_language: str = "Hindi"):
+    return translate_caption(text, target_language)
+
+
 @app.post("/api/image-prompt")
 @app.post("/api/content/image-prompt")
 @app.post("/api/image-generator")
 def api_image(req: CaptionRequest):
     return generate_prompt_package(req.topic, req.platform)
+
+
+@app.get("/api/image-generator-demo")
+def api_image_demo(topic: str = "AI social media automation dashboard for creators", platform: str = "Instagram"):
+    return generate_prompt_package(topic, platform)
 
 
 @app.post("/api/predict-engagement")
@@ -340,6 +333,11 @@ def api_predict(req: PredictionRequest):
 @app.post("/api/trained-analyzer")
 def api_trained_analyser(req: TrainedAnalyserRequest):
     return analyse_content(req.caption, req.platform, req.content_type, req.day_of_week, req.hour_posted, req.hashtags)
+
+
+@app.get("/api/trained-analyser-demo")
+def api_trained_analyser_demo(caption: str = "AI automation helps creators plan and publish better posts.", platform: str = "Instagram", hashtags: str = "#AI #SocialMedia", content_type: str = "reel"):
+    return analyse_content(caption, platform, content_type, "Friday", 19, hashtags)
 
 
 @app.post("/api/ab-test")
@@ -387,6 +385,11 @@ def api_publish(req: PublishRequest):
     return publish_post(req.platform, req.caption, req.media_url)
 
 
+@app.get("/api/publisher-demo")
+def api_publisher_demo(platform: str = "Instagram", caption: str = "AI automation test caption #AI", media_url: Optional[str] = None):
+    return publish_post(platform, caption, media_url)
+
+
 @app.post("/api/telegram")
 @app.post("/api/integrations/telegram/send")
 def api_telegram(req: TelegramRequest):
@@ -409,6 +412,11 @@ def api_feedback(req: FeedbackRequest):
     return _save_feedback_record(req.platform, req.caption, req.rating, req.notes, req.actual_engagement)
 
 
+@app.get("/api/review-demo")
+def api_review_demo(platform: str = "Instagram", caption: str = "AI automation test caption #AI", rating: int = 5, notes: str = "Good hook and CTA"):
+    return _save_feedback_record(platform, caption, rating, notes)
+
+
 @app.get("/api/feedback")
 @app.get("/api/feedback-loop")
 def api_feedback_summary():
@@ -423,36 +431,11 @@ def build_post_package(req: RawToPostRequest):
     plagiarism = _safe_step("plagiarism", lambda: check_plagiarism(caption_text))
     image_prompt = _safe_step("image_prompt", lambda: generate_prompt_package(req.raw_text, req.platform))
     best_time = _safe_step("best_time", lambda: recommend_best_time(req.platform), None)
-    prediction = _safe_step("engagement_prediction", lambda: predict_engagement({
-        "platform": req.platform,
-        "content_type": "reel",
-        "day_of_week": str((best_time or {}).get("day_of_week", "Friday")),
-        "hour_posted": int((best_time or {}).get("hour_posted", 19)),
-        "caption": caption_text,
-        "hashtags": _hashtag_string(hashtags),
-        "sentiment_score": 0.7,
-        "has_image": 1,
-    }))
+    prediction = _safe_step("engagement_prediction", lambda: predict_engagement({"platform": req.platform, "content_type": "reel", "day_of_week": str((best_time or {}).get("day_of_week", "Friday")), "hour_posted": int((best_time or {}).get("hour_posted", 19)), "caption": caption_text, "hashtags": _hashtag_string(hashtags), "sentiment_score": 0.7, "has_image": 1}))
     publish_preview = _safe_step("publish_preview", lambda: publish_post(req.platform, caption_text, req.media_url))
     translated = _safe_step("multilingual", lambda: translate_caption(caption_text, "Hindi"))
     analyser = _safe_step("trained_analyser", lambda: analyse_content(caption_text, req.platform, "reel", str((best_time or {}).get("day_of_week", "Friday")), int((best_time or {}).get("hour_posted", 19)), _hashtag_string(hashtags)))
-    return {
-        "platform": req.platform,
-        "campaign_goal": req.campaign_goal,
-        "caption": caption_text,
-        "captions": captions,
-        "hashtags": hashtags,
-        "moderation": moderation,
-        "plagiarism": plagiarism,
-        "image_prompt": image_prompt,
-        "engagement_prediction": prediction,
-        "best_time": best_time,
-        "multilingual_preview": translated,
-        "trained_analyser": analyser,
-        "content_brief": _safe_step("content_brief", lambda: content_brief(req.platform)),
-        "publish_preview": publish_preview,
-        "note": "Publishing remains dry-run unless POSTING_MODE=live and platform credentials are configured.",
-    }
+    return {"platform": req.platform, "campaign_goal": req.campaign_goal, "caption": caption_text, "captions": captions, "hashtags": hashtags, "moderation": moderation, "plagiarism": plagiarism, "image_prompt": image_prompt, "engagement_prediction": prediction, "best_time": best_time, "multilingual_preview": translated, "trained_analyser": analyser, "content_brief": _safe_step("content_brief", lambda: content_brief(req.platform)), "publish_preview": publish_preview, "note": "Publishing remains dry-run unless POSTING_MODE=live and platform credentials are configured."}
 
 
 @app.post("/api/full-pipeline")
