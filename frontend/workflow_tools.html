@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Social Studio | Workflow Tools</title>
+  <link rel="stylesheet" href="/static/styles.css?v=2.0" />
+</head>
+<body>
+  <main class="main-panel">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SQLite workflow tools</p>
+        <h1>Post database, scheduling, rescheduling, approval, and review tracking.</h1>
+        <p>This frontend page is connected with the backend APIs available in FastAPI docs.</p>
+      </div>
+      <div class="top-actions">
+        <a class="ghost small" href="/app">Back to main app</a>
+        <a class="cta small" href="/docs">Open API docs</a>
+      </div>
+    </header>
+
+    <section class="card-grid">
+      <article class="tool-card">
+        <span class="label">Step 1</span>
+        <h3>Save post</h3>
+        <p>Use backend API <b>POST /api/db/posts</b> to save generated captions into SQLite.</p>
+        <pre>{
+  "caption": "AI automation test caption #AI",
+  "platform": "Instagram",
+  "hashtags": "#AI #Automation",
+  "title": "AI Social Studio post",
+  "content_type": "reel",
+  "created_by": "editor_creator"
+}</pre>
+      </article>
+
+      <article class="tool-card">
+        <span class="label">Step 2</span>
+        <h3>Schedule post</h3>
+        <p>Use backend API <b>POST /api/db/schedule</b> to schedule a saved post.</p>
+        <pre>{
+  "post_id": 1,
+  "scheduled_date": "2026-06-20",
+  "scheduled_time": "19:00",
+  "username": "editor_creator"
+}</pre>
+      </article>
+
+      <article class="tool-card">
+        <span class="label">Step 3</span>
+        <h3>Reschedule post</h3>
+        <p>Use backend API <b>POST /api/db/reschedule</b> to change an existing scheduled time.</p>
+        <pre>{
+  "post_id": 1,
+  "new_date": "2026-06-21",
+  "new_time": "20:00",
+  "username": "editor_creator",
+  "reason": "Better engagement slot"
+}</pre>
+      </article>
+
+      <article class="tool-card">
+        <span class="label">Step 4</span>
+        <h3>Review tracking</h3>
+        <p>Use backend API <b>POST /api/db/review</b> to save content performance ratings into SQLite.</p>
+        <pre>{
+  "post_id": 1,
+  "platform": "Instagram",
+  "caption": "AI automation test caption #AI",
+  "rating": 5,
+  "notes": "Good hook and CTA",
+  "created_by": "editor_creator"
+}</pre>
+      </article>
+
+      <article class="tool-card wide">
+        <span class="label">History APIs</span>
+        <h3>Check saved data</h3>
+        <p>Open these URLs after running the backend:</p>
+        <pre>/api/db/posts
+/api/db/schedules
+/api/db/reviews
+/api/db/charts
+/api/db/activity</pre>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
