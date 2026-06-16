@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from database_manager import init_db, list_posts, save_post, get_post, update_post, list_users, dashboard_charts
+from database_manager import init_db, list_posts, save_post, get_post, update_post, list_users, dashboard_charts, list_schedules, schedule_post
 
 router = APIRouter(prefix="/api/db", tags=["SQLite workspace"])
 
@@ -30,6 +30,13 @@ class EditPostRequest(BaseModel):
     scheduled_date: Optional[str] = None
     scheduled_time: Optional[str] = None
     updated_by: str = "editor_creator"
+
+
+class ScheduleRequest(BaseModel):
+    post_id: int
+    scheduled_date: str
+    scheduled_time: str
+    username: str = "editor_creator"
 
 
 @router.get("/init")
@@ -65,6 +72,17 @@ def db_get_post(post_id: int):
 def db_update_post(post_id: int, req: EditPostRequest):
     post = update_post(post_id, **req.dict())
     return {"status": "success", "message": "Post updated", "post": post} if post else {"status": "error", "message": "Post not found"}
+
+
+@router.post("/schedule")
+def db_schedule(req: ScheduleRequest):
+    post = schedule_post(req.post_id, req.scheduled_date, req.scheduled_time, req.username)
+    return {"status": "success", "message": "Post scheduled", "post": post}
+
+
+@router.get("/schedules")
+def db_schedules(limit: int = 50):
+    return {"schedules": list_schedules(limit)}
 
 
 @router.get("/charts")
