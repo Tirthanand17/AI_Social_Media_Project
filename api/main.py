@@ -69,9 +69,16 @@ def _hashtag_string(hashtags) -> str:
     return " ".join(tag_list) if tag_list else "#AI #SocialMedia"
 
 
+def _safe_step(name, func, fallback=None):
+    try:
+        return func()
+    except Exception as exc:
+        return fallback if fallback is not None else {"status": "error", "step": name, "message": str(exc)}
+
+
 allowed_origins = _allowed_origins()
 
-app = FastAPI(title="AI Social Media Automation API", version="1.2.0")
+app = FastAPI(title="AI Social Media Automation API", version="1.2.1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -153,7 +160,7 @@ def root():
 
 @app.get("/app")
 def frontend():
-    return FileResponse(FRONTEND_DIR / "index.html")
+    return FileResponse(FRONTEND_DIR / "index.html", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/health")
@@ -197,7 +204,8 @@ def api_caption(req: CaptionRequest):
 
 @app.post("/api/generate-multiple-captions")
 def api_multiple_captions(req: MultipleCaptionRequest):
-    return {"captions": generate_multiple_captions(req.topic, req.platform, req.count)}
+    captions = generate_multiple_captions(req.topic, count=req.count, platform=req.platform)
+    return {"captions": captions}
 
 
 @app.post("/api/hashtags")
@@ -244,7 +252,7 @@ def api_translate(req: TranslateRequest):
 @app.post("/api/image-prompt")
 @app.post("/api/content/image-prompt")
 def api_image(req: CaptionRequest):
-    return generate_prompt_package(req.topic, req.platform, req.tone)
+    return generate_prompt_package(req.topic, req.platform)
 
 
 @app.post("/api/predict-engagement")
@@ -272,7 +280,7 @@ def api_analytics(platform: Optional[str] = None):
 @app.get("/api/competitors")
 @app.get("/api/competitors/summary")
 def api_competitors(platform: str = "Instagram"):
-    return competitor_summary(platform)
+    return competitor_summary()
 
 
 @app.get("/api/scheduler")
@@ -315,14 +323,14 @@ def api_content_brief_post(req: RawToPostRequest):
 
 
 def build_post_package(req: RawToPostRequest):
-    captions = generate_caption(req.raw_text, req.platform, req.tone)
-    caption_text = _caption_text(captions)
-    hashtags = hashtag_strategy(caption_text, req.platform)
-    moderation = moderate_text(caption_text)
-    plagiarism = check_plagiarism(caption_text)
-    image_prompt = generate_prompt_package(req.raw_text, req.platform, req.tone)
-    best_time = recommend_best_time(req.platform)
-    prediction = predict_engagement({
+    captions = _safe_step("caption", lambda: generate_caption(req.raw_text, req.platform, req.tone), "")
+    caption_text = _caption_text(captions) if captions else req.raw_text
+    hashtags = _safe_step("hashtags", lambda: hashtag_strategy(caption_text, req.platform), {"hashtag_string": "#AI #SocialMedia", "hashtags": ["#AI", "#SocialMedia"]})
+    moderation = _safe_step("moderation", lambda: moderate_text(caption_text))
+    plagiarism = _safe_step("plagiarism", lambda: check_plagiarism(caption_text))
+    image_prompt = _safe_step("image_prompt", lambda: generate_prompt_package(req.raw_text, req.platform))
+    best_time = _safe_step("best_time", lambda: recommend_best_time(req.platform), None)
+    prediction = _safe_step("engagement_prediction", lambda: predict_engagement({
         "platform": req.platform,
         "content_type": "reel",
         "day_of_week": str((best_time or {}).get("day_of_week", "Friday")),
@@ -331,8 +339,8 @@ def build_post_package(req: RawToPostRequest):
         "hashtags": _hashtag_string(hashtags),
         "sentiment_score": 0.7,
         "has_image": 1,
-    })
-    publish_preview = publish_post(req.platform, caption_text, req.media_url)
+    }))
+    publish_preview = _safe_step("publish_preview", lambda: publish_post(req.platform, caption_text, req.media_url))
     return {
         "platform": req.platform,
         "campaign_goal": req.campaign_goal,
@@ -344,7 +352,7 @@ def build_post_package(req: RawToPostRequest):
         "image_prompt": image_prompt,
         "engagement_prediction": prediction,
         "best_time": best_time,
-        "content_brief": content_brief(req.platform),
+        "content_brief": _safe_step("content_brief", lambda: content_brief(req.platform)),
         "publish_preview": publish_preview,
         "note": "Publishing remains dry-run unless POSTING_MODE=live and platform credentials are configured.",
     }
