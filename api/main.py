@@ -60,6 +60,15 @@ def _caption_text(caption_response) -> str:
     return str(caption_response)
 
 
+def _hashtag_string(hashtags) -> str:
+    if not isinstance(hashtags, dict):
+        return "#AI #SocialMedia"
+    if hashtags.get("hashtag_string"):
+        return str(hashtags["hashtag_string"])
+    tag_list = hashtags.get("hashtags") or hashtags.get("recommended_hashtags") or []
+    return " ".join(tag_list) if tag_list else "#AI #SocialMedia"
+
+
 allowed_origins = _allowed_origins()
 
 app = FastAPI(title="AI Social Media Automation API", version="1.2.0")
@@ -319,7 +328,7 @@ def build_post_package(req: RawToPostRequest):
         "day_of_week": str((best_time or {}).get("day_of_week", "Friday")),
         "hour_posted": int((best_time or {}).get("hour_posted", 19)),
         "caption": caption_text,
-        "hashtags": " ".join(hashtags.get("recommended_hashtags", [])) if isinstance(hashtags, dict) else "#AI #SocialMedia",
+        "hashtags": _hashtag_string(hashtags),
         "sentiment_score": 0.7,
         "has_image": 1,
     })
