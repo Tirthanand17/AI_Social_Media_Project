@@ -39,6 +39,14 @@ class ScheduleRequest(BaseModel):
     username: str = "editor_creator"
 
 
+class RescheduleRequest(BaseModel):
+    post_id: int
+    new_date: str
+    new_time: str
+    username: str = "editor_creator"
+    reason: str = ""
+
+
 class ApprovalRequest(BaseModel):
     post_id: int
     approved_by: str = "admin_techcreate"
@@ -97,6 +105,28 @@ def db_approve_post(req: ApprovalRequest):
 def db_schedule(req: ScheduleRequest):
     post = schedule_post(req.post_id, req.scheduled_date, req.scheduled_time, req.username)
     return {"status": "success", "message": "Post scheduled", "post": post}
+
+
+@router.post("/reschedule")
+def db_reschedule(req: RescheduleRequest):
+    post = get_post(req.post_id)
+    if not post:
+        return {"status": "error", "message": "Post not found"}
+    updated = schedule_post(req.post_id, req.new_date, req.new_time, req.username)
+    return {
+        "status": "success",
+        "message": "Post rescheduled",
+        "old_schedule": {"date": post.get("scheduled_date", ""), "time": post.get("scheduled_time", "")},
+        "new_schedule": {"date": req.new_date, "time": req.new_time},
+        "reason": req.reason,
+        "post": updated,
+    }
+
+
+@router.post("/posts/{post_id}/reschedule")
+def db_reschedule_by_id(post_id: int, req: RescheduleRequest):
+    req.post_id = post_id
+    return db_reschedule(req)
 
 
 @router.get("/schedules")
