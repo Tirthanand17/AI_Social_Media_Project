@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from database_manager import init_db, list_posts, save_post, get_post, update_post, list_users, dashboard_charts, list_schedules, schedule_post
+from database_manager import init_db, list_posts, save_post, get_post, update_post, list_users, dashboard_charts, list_schedules, schedule_post, submit_for_approval, approve_post
 
 router = APIRouter(prefix="/api/db", tags=["SQLite workspace"])
 
@@ -39,6 +39,13 @@ class ScheduleRequest(BaseModel):
     username: str = "editor_creator"
 
 
+class ApprovalRequest(BaseModel):
+    post_id: int
+    approved_by: str = "admin_techcreate"
+    approved: bool = True
+    reason: str = ""
+
+
 @router.get("/init")
 def db_init():
     return init_db(seed_demo=True)
@@ -72,6 +79,18 @@ def db_get_post(post_id: int):
 def db_update_post(post_id: int, req: EditPostRequest):
     post = update_post(post_id, **req.dict())
     return {"status": "success", "message": "Post updated", "post": post} if post else {"status": "error", "message": "Post not found"}
+
+
+@router.post("/posts/{post_id}/submit")
+def db_submit_post(post_id: int, username: str = "editor_creator"):
+    post = submit_for_approval(post_id, username)
+    return {"status": "success", "message": "Post sent for admin approval", "post": post}
+
+
+@router.post("/approve")
+def db_approve_post(req: ApprovalRequest):
+    post = approve_post(req.post_id, req.approved_by, req.approved, req.reason)
+    return {"status": "success", "message": "Post approved" if req.approved else "Post rejected", "post": post}
 
 
 @router.post("/schedule")
