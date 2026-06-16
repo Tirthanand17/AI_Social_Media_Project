@@ -11,64 +11,63 @@ const api = async (path, options = {}) => {
 };
 
 const pretty = (value) => JSON.stringify(value, null, 2);
-
-if ("scrollRestoration" in history) {
-  history.scrollRestoration = "manual";
-}
-window.scrollTo({ top: 0, behavior: "auto" });
-
+const byId = (id) => document.getElementById(id);
 const setText = (id, value) => {
-  document.getElementById(id).textContent =
-    typeof value === "string" ? value : pretty(value);
+  const element = byId(id);
+  if (!element) return;
+  element.textContent = typeof value === "string" ? value : pretty(value);
 };
-
 const formJson = (form) => Object.fromEntries(new FormData(form).entries());
+const platformForApi = (value) => (value === "X" ? "Twitter" : value);
+
 let currentBrief = null;
 let generatedCaption = "";
 let currentUser = null;
 let currentPackage = null;
 
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
+function activateTab(target) {
+  document.querySelectorAll(".tab").forEach((item) => item.classList.toggle("active", item.dataset.tab === target));
+  document.querySelectorAll(".workspace").forEach((item) => item.classList.toggle("active", item.id === target));
+  window.scrollTo({ top: 0, behavior: "auto" });
+  if (target === "dashboard") loadDashboard();
+  if (target === "analytics") loadAnalytics();
+  if (target === "calendar") loadCalendar();
+  if (target === "admin") {
+    loadCompetitors();
+    loadIntegrations();
+  }
+}
+
 document.querySelectorAll(".tab").forEach((button) => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
-    document.querySelectorAll(".workspace").forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
-    document.getElementById(button.dataset.tab).classList.add("active");
-    window.scrollTo({ top: 0, behavior: "auto" });
-    if (button.dataset.tab === "dashboard") loadDashboard();
-    if (button.dataset.tab === "analytics") loadAnalytics();
-    if (button.dataset.tab === "calendar") loadCalendar();
-    if (button.dataset.tab === "admin") {
-      loadCompetitors();
-      loadIntegrations();
-    }
-  });
+  button.addEventListener("click", () => activateTab(button.dataset.tab));
 });
 
 document.querySelectorAll("[data-jump]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const target = button.dataset.jump;
-    const tab = document.querySelector(`.tab[data-tab="${target}"]`);
-    if (tab) tab.click();
-    document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  button.addEventListener("click", () => activateTab(button.dataset.jump));
 });
 
 async function checkHealth() {
   try {
-    const data = await api("/api/health");
-    const status = document.getElementById("apiStatus");
-    status.textContent = data.status === "running" ? "Online" : "Issue";
-    status.classList.add("ok");
+    const [health, config] = await Promise.all([api("/api/health"), api("/api/config")]);
+    const status = byId("apiStatus");
+    status.textContent = health.status === "ok" ? "Online" : "Issue";
+    status.classList.toggle("ok", health.status === "ok");
+    byId("postingModeBadge").textContent = config.posting_mode || health.posting_mode || "dry_run";
+    byId("postingMode").textContent = config.posting_mode || health.posting_mode || "dry_run";
   } catch (error) {
-    document.getElementById("apiStatus").textContent = "Offline";
+    byId("apiStatus").textContent = "Offline";
+    setText("rawPostOutput", `API is not reachable: ${error.message}`);
   }
 }
 
 function setUser(loginResult) {
   if (!loginResult?.success) return;
   currentUser = loginResult.user;
-  document.getElementById("userPill").textContent = `${currentUser.role}: ${currentUser.username}`;
+  byId("userPill").textContent = `${currentUser.role}: ${currentUser.username}`;
 }
 
 function loginSummary(result) {
@@ -82,65 +81,75 @@ function loginSummary(result) {
 }
 
 function openLogin() {
-  document.getElementById("loginModal").classList.add("open");
-  document.getElementById("loginModal").setAttribute("aria-hidden", "false");
+  byId("loginModal").classList.add("open");
+  byId("loginModal").setAttribute("aria-hidden", "false");
 }
 
 function closeLogin() {
-  document.getElementById("loginModal").classList.remove("open");
-  document.getElementById("loginModal").setAttribute("aria-hidden", "true");
+  byId("loginModal").classList.remove("open");
+  byId("loginModal").setAttribute("aria-hidden", "true");
 }
 
-document.getElementById("loginOpen").addEventListener("click", openLogin);
-document.getElementById("loginClose").addEventListener("click", closeLogin);
+byId("loginOpen").addEventListener("click", openLogin);
+byId("loginClose").addEventListener("click", closeLogin);
+byId("loginModal").addEventListener("click", (event) => {
+  if (event.target.id === "loginModal") closeLogin();
+});
 
-document.getElementById("topLoginForm").addEventListener("submit", async (event) => {
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeLogin();
+});
+
+async function handleLogin(event, outputId) {
   event.preventDefault();
   try {
-    const result = await api("/api/auth/login", {
+    const result = await api("/api/login", {
       method: "POST",
       body: JSON.stringify(formJson(event.currentTarget)),
     });
-    setText("topLoginOutput", loginSummary(result));
+    setText(outputId, loginSummary(result));
     setUser(result);
     if (result.success) closeLogin();
   } catch (error) {
-    setText("topLoginOutput", error.message);
-  }
-});
-
-async function loadDashboard() {
-  try {
-    const [overview, integrations] = await Promise.all([
-      api("/api/data/overview"),
-      api("/api/integrations/status"),
-    ]);
-    document.getElementById("datasetCount").textContent = overview.datasets?.length ?? "--";
-    document.getElementById("postingMode").textContent = integrations.posting_mode || "dry_run";
-    renderPlatformReadiness(integrations);
-  } catch (error) {
-    document.getElementById("datasetCount").textContent = "--";
-    document.getElementById("postingMode").textContent = "offline";
-    document.getElementById("platformReadiness").innerHTML =
-      `<article class="platform-card warn"><strong>API</strong><span>${error.message}</span></article>`;
+    setText(outputId, error.message);
   }
 }
 
-function renderPlatformReadiness(data) {
+byId("topLoginForm").addEventListener("submit", (event) => handleLogin(event, "topLoginOutput"));
+byId("loginForm").addEventListener("submit", (event) => handleLogin(event, "loginOutput"));
+
+async function loadDashboard() {
+  try {
+    const [overview, integrations] = await Promise.all([api("/api/dataset-overview"), api("/api/integrations")]);
+    const datasets = overview.datasets || overview || [];
+    byId("datasetCount").textContent = Array.isArray(datasets) ? datasets.length : overview.total_datasets || "--";
+    byId("postingMode").textContent = integrations.posting_mode || byId("postingModeBadge").textContent || "dry_run";
+    byId("postingModeBadge").textContent = integrations.posting_mode || "dry_run";
+    renderPlatformReadiness(integrations);
+  } catch (error) {
+    byId("datasetCount").textContent = "--";
+    byId("postingMode").textContent = "offline";
+    byId("platformReadiness").innerHTML = `<article class="platform-card warn"><strong>API</strong><span>${error.message}</span></article>`;
+  }
+}
+
+function renderPlatformReadiness(data = {}) {
+  const linkedinReady = data.linkedin?.live_ready || data.linkedin?.access_token === "configured";
+  const xReady = data.x?.live_ready || data.x?.bearer_token === "configured";
   const platforms = [
-    ["Instagram", true, "Dry-run ready. Live requires Meta page/account permissions."],
-    ["Facebook", true, "Dry-run ready. Live requires Meta page token and page permissions."],
-    ["X", data.x?.bearer_token === "configured", data.x?.live_ready ? "Live ready" : "Read/status configured; write OAuth still needed."],
-    ["LinkedIn", data.linkedin?.access_token === "configured", data.linkedin?.live_ready ? "Live ready" : "Token stored; author URN still needed."],
+    ["Instagram", true, "Dry-run ready. Live posting requires Meta permissions."],
+    ["Facebook", true, "Dry-run ready. Live posting requires page token."],
+    ["X", xReady, data.x?.live_ready ? "Live ready" : "Dry-run ready; write OAuth required for live posts."],
+    ["LinkedIn", linkedinReady, data.linkedin?.live_ready ? "Live ready" : "Token/author setup needed for live publishing."],
   ];
-  document.getElementById("platformReadiness").innerHTML = platforms
+  byId("platformReadiness").innerHTML = platforms
     .map(([name, ok, note]) => `<article class="platform-card ${ok ? "ok" : "warn"}"><strong>${name}</strong><span>${note}</span></article>`)
     .join("");
 }
 
 async function loadBrief() {
   try {
-    const platform = document.getElementById("briefPlatform").value;
+    const platform = platformForApi(byId("briefPlatform").value);
     currentBrief = await api(`/api/content/brief?platform=${encodeURIComponent(platform)}`);
     setText("briefOutput", {
       platform: currentBrief.platform,
@@ -154,58 +163,75 @@ async function loadBrief() {
   }
 }
 
-document.getElementById("loadBriefButton").addEventListener("click", loadBrief);
-document.getElementById("briefPlatform").addEventListener("change", loadBrief);
+byId("loadBriefButton").addEventListener("click", loadBrief);
+byId("briefPlatform").addEventListener("change", loadBrief);
 
-document.getElementById("useBriefButton").addEventListener("click", async () => {
+byId("useBriefButton").addEventListener("click", async () => {
   if (!currentBrief) await loadBrief();
-  const form = document.getElementById("generateForm");
+  if (!currentBrief) return;
+  const form = byId("generateForm");
   form.elements.topic.value = currentBrief.recommended_topic || currentBrief.topic_seed || form.elements.topic.value;
   form.elements.platform.value = currentBrief.platform === "Twitter" ? "X" : currentBrief.platform;
 });
 
-document.getElementById("copyToPublisherButton").addEventListener("click", () => {
-  const caption = generatedCaption || document.getElementById("captionOutput").textContent;
+byId("copyToPublisherButton").addEventListener("click", () => {
+  const caption = generatedCaption || byId("captionOutput").textContent;
   if (caption && !caption.includes("Ready")) {
-    document.getElementById("publishCaption").value = caption;
-    document.getElementById("publishPlatform").value = document.getElementById("generateForm").elements.platform.value;
-    document.querySelector('.tab[data-tab="admin"]').click();
+    byId("publishCaption").value = caption;
+    byId("publishPlatform").value = byId("generateForm").elements.platform.value;
+    activateTab("admin");
   }
 });
+
+function extractHashtags(data) {
+  if (!data) return "Ready.";
+  return data.hashtag_string || data.hashtags?.join(" ") || data.recommended_hashtags?.join(" ") || pretty(data);
+}
+
+function extractPredictionScore(prediction) {
+  return (
+    prediction?.predicted_engagement_score ??
+    prediction?.engagement_score ??
+    prediction?.score ??
+    prediction?.prediction ??
+    0
+  );
+}
 
 function applyPostPackage(data) {
   currentPackage = data;
   generatedCaption = data.caption || "";
   const bestTime = data.best_time
-    ? `${data.best_time.day_of_week || ""} ${data.best_time.hour_posted ?? ""}:00`.trim()
+    ? `${data.best_time.day_of_week || data.best_time.day || ""} ${data.best_time.hour_posted ?? data.best_time.hour ?? ""}:00`.trim()
     : "Not available";
   setText("rawPostOutput", {
     platform: data.platform,
+    campaign_goal: data.campaign_goal,
     caption: data.caption,
-    hashtags: data.hashtags?.hashtag_string,
+    hashtags: extractHashtags(data.hashtags),
     best_time: bestTime,
-    predicted_score: data.engagement_prediction?.predicted_engagement_score,
-    publish_status: data.publish_preview?.status,
+    predicted_score: extractPredictionScore(data.engagement_prediction),
+    publish_status: data.publish_preview?.status || data.publish_preview?.message || "dry_run preview",
   });
   setText("captionOutput", data.caption || "Ready.");
-  setText("hashtagOutput", data.hashtags?.hashtag_string || "Ready.");
+  setText("hashtagOutput", extractHashtags(data.hashtags));
   setText("safetyOutput", { moderation: data.moderation, plagiarism: data.plagiarism });
   setText("imagePromptOutput", data.image_prompt || "Ready.");
-  if (data.engagement_prediction?.predicted_engagement_score !== undefined) {
-    updateGauge(data.engagement_prediction.predicted_engagement_score);
-    setText("predictionOutput", data.engagement_prediction);
-  }
-  document.getElementById("publishCaption").value = data.caption || "";
-  document.getElementById("publishPlatform").value = data.platform || "Instagram";
+  updateGauge(extractPredictionScore(data.engagement_prediction));
+  setText("predictionOutput", data.engagement_prediction || "Ready.");
+  byId("publishCaption").value = data.caption || "";
+  byId("publishPlatform").value = data.platform === "Twitter" ? "X" : data.platform || "Instagram";
 }
 
-document.getElementById("rawPostForm").addEventListener("submit", async (event) => {
+byId("rawPostForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   setText("rawPostOutput", "Building post package from raw data...");
   try {
-    const data = await api("/api/content/raw-to-post", {
+    const payload = formJson(event.currentTarget);
+    payload.platform = platformForApi(payload.platform);
+    const data = await api("/api/full-pipeline", {
       method: "POST",
-      body: JSON.stringify(formJson(event.currentTarget)),
+      body: JSON.stringify(payload),
     });
     applyPostPackage(data);
   } catch (error) {
@@ -213,42 +239,43 @@ document.getElementById("rawPostForm").addEventListener("submit", async (event) 
   }
 });
 
-document.getElementById("reviewPackageButton").addEventListener("click", () => {
+byId("reviewPackageButton").addEventListener("click", () => {
   if (currentPackage) applyPostPackage(currentPackage);
-  document.querySelector('.tab[data-tab="generate"]').click();
+  activateTab("generate");
 });
 
-document.getElementById("publishPackageButton").addEventListener("click", () => {
+byId("publishPackageButton").addEventListener("click", () => {
   if (currentPackage) applyPostPackage(currentPackage);
-  document.querySelector('.tab[data-tab="admin"]').click();
+  activateTab("admin");
 });
 
 function updateGauge(score) {
-  const gauge = document.getElementById("predictionGauge");
+  const gauge = byId("predictionGauge");
   const safeScore = Math.max(0, Math.min(100, Number(score) || 0));
   const degrees = Math.round((safeScore / 100) * 360);
-  gauge.style.background = `radial-gradient(circle at center, #ffffff 0 56%, transparent 57%), conic-gradient(var(--red) ${degrees}deg, #edf2f4 ${degrees}deg)`;
-  gauge.querySelector("span").textContent = Math.round(safeScore);
+  gauge.style.background = `radial-gradient(circle at center, #ffffff 0 58%, transparent 59%), conic-gradient(var(--primary) ${degrees}deg, #edf2f7 ${degrees}deg)`;
+  gauge.querySelector("span").textContent = safeScore ? Math.round(safeScore) : "--";
 }
 
-document.getElementById("generateForm").addEventListener("submit", async (event) => {
+byId("generateForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const payload = formJson(event.currentTarget);
-  setText("captionOutput", "Generating with connected AI provider...");
+  payload.platform = platformForApi(payload.platform);
+  setText("captionOutput", "Generating content package...");
   try {
-    const caption = await api("/api/content/generate-caption", {
+    const caption = await api("/api/generate-caption", {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    generatedCaption = caption.caption;
-    setText("captionOutput", caption.caption);
+    generatedCaption = caption.caption || caption.captions?.[0]?.caption || "";
+    setText("captionOutput", generatedCaption || caption);
     const [hashtags, moderation, plagiarism, imagePrompt] = await Promise.all([
-      api("/api/content/hashtags", { method: "POST", body: JSON.stringify({ text: caption.caption, platform: payload.platform }) }),
-      api("/api/content/moderate", { method: "POST", body: JSON.stringify({ text: caption.caption, platform: payload.platform }) }),
-      api("/api/content/plagiarism", { method: "POST", body: JSON.stringify({ text: caption.caption, platform: payload.platform }) }),
-      api("/api/content/image-prompt", { method: "POST", body: JSON.stringify(payload) }),
+      api("/api/hashtags", { method: "POST", body: JSON.stringify({ text: generatedCaption, platform: payload.platform }) }),
+      api("/api/moderate", { method: "POST", body: JSON.stringify({ text: generatedCaption, platform: payload.platform }) }),
+      api("/api/plagiarism", { method: "POST", body: JSON.stringify({ text: generatedCaption, platform: payload.platform }) }),
+      api("/api/image-prompt", { method: "POST", body: JSON.stringify(payload) }),
     ]);
-    setText("hashtagOutput", hashtags.hashtag_string);
+    setText("hashtagOutput", extractHashtags(hashtags));
     setText("safetyOutput", { moderation, plagiarism });
     setText("imagePromptOutput", imagePrompt);
   } catch (error) {
@@ -256,21 +283,22 @@ document.getElementById("generateForm").addEventListener("submit", async (event)
   }
 });
 
-document.getElementById("predictForm").addEventListener("submit", async (event) => {
+byId("predictForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const payload = formJson(event.currentTarget);
+  payload.platform = platformForApi(payload.platform);
   payload.hour_posted = Number(payload.hour_posted);
-  payload.hashtags = (payload.caption.match(/#\w+/g) || []).join(" ");
+  payload.hashtags = (payload.caption.match(/#\w+/g) || []).join(" ") || "#AI #SocialMedia";
   payload.sentiment_score = 0.7;
   payload.has_image = 1;
   setText("predictionOutput", "Scoring content performance...");
   updateGauge(0);
   try {
-    const prediction = await api("/api/ml/predict-engagement", {
+    const prediction = await api("/api/predict-engagement", {
       method: "POST",
       body: JSON.stringify(payload),
     });
-    updateGauge(prediction.predicted_engagement_score);
+    updateGauge(extractPredictionScore(prediction));
     setText("predictionOutput", prediction);
   } catch (error) {
     setText("predictionOutput", error.message);
@@ -278,152 +306,143 @@ document.getElementById("predictForm").addEventListener("submit", async (event) 
 });
 
 function renderTable(id, rows, columns) {
-  const table = document.getElementById(id);
+  const table = byId(id);
   if (!rows || rows.length === 0) {
-    table.innerHTML = "<tbody><tr><td>No data</td></tr></tbody>";
+    table.innerHTML = "<tbody><tr><td>No data available</td></tr></tbody>";
     return;
   }
   const header = columns.map((column) => `<th>${column.label}</th>`).join("");
   const body = rows
-    .map((row) =>
-      `<tr>${columns
-        .map((column) => `<td>${String(row[column.key] ?? "")}</td>`)
-        .join("")}</tr>`
-    )
+    .map((row) => `<tr>${columns.map((column) => `<td>${String(row[column.key] ?? "")}</td>`).join("")}</tr>`)
     .join("");
   table.innerHTML = `<thead><tr>${header}</tr></thead><tbody>${body}</tbody>`;
 }
 
 function renderMetrics(analytics) {
-  document.getElementById("metricStrip").innerHTML = [
+  byId("metricStrip").innerHTML = [
     ["Posts", analytics.records],
     ["Reach", analytics.total_reach],
     ["Likes", analytics.total_likes],
     ["Avg ER", analytics.avg_engagement_rate],
   ]
-    .map(([label, value]) => `<div class="metric"><span>${label}</span><strong>${value}</strong><em></em></div>`)
+    .map(([label, value]) => `<article class="metric"><span>${label}</span><strong>${value ?? "--"}</strong><em>From analytics dataset</em></article>`)
     .join("");
 }
 
-function renderBars(posts) {
+function renderBars(posts = []) {
   const max = Math.max(...posts.map((post) => Number(post.engagement_rate) || 0), 1);
-  document.getElementById("engagementBars").innerHTML = posts
+  byId("engagementBars").innerHTML = posts
     .slice(0, 14)
     .map((post) => {
       const height = Math.max(18, Math.round(((Number(post.engagement_rate) || 0) / max) * 100));
-      return `<span class="bar" title="${post.platform} ${post.engagement_rate}" style="height:${height}%"></span>`;
+      return `<span class="bar" title="${post.platform || "post"}: ${post.engagement_rate}" style="height:${height}%"></span>`;
     })
     .join("");
 }
 
-function renderTrendCloud(trends) {
-  document.getElementById("trendCloud").innerHTML = trends
-    .slice(0, 16)
-    .map((item) => `<span class="trend-chip" style="font-size:${12 + Math.min(12, item.trend_score / 10)}px">${item.keyword}</span>`)
+function renderTrendCloud(trends = []) {
+  byId("trendCloud").innerHTML = trends
+    .slice(0, 18)
+    .map((item) => `<span class="trend-chip" style="font-size:${12 + Math.min(12, Number(item.trend_score || 0) / 10)}px">${item.keyword}</span>`)
     .join("");
 }
 
 async function loadAnalytics() {
-  const [analytics, trends] = await Promise.all([
-    api("/api/analytics/summary"),
-    api("/api/trends/analyze"),
-  ]);
-  renderMetrics(analytics);
-  renderBars(analytics.top_posts);
-  renderTrendCloud(trends.trending_keywords || []);
-  renderTable("topPostsTable", analytics.top_posts, [
-    { key: "post_id", label: "Post" },
-    { key: "platform", label: "Platform" },
-    { key: "likes", label: "Likes" },
-    { key: "comments", label: "Comments" },
-    { key: "shares", label: "Shares" },
-    { key: "engagement_rate", label: "Engagement" },
-  ]);
-  renderTable("trendsTable", trends.trending_keywords, [
-    { key: "keyword", label: "Keyword" },
-    { key: "platform", label: "Platform" },
-    { key: "trend_score", label: "Score" },
-    { key: "trend_category", label: "Category" },
-  ]);
+  try {
+    const [analytics, trends] = await Promise.all([api("/api/analytics"), api("/api/trends")]);
+    renderMetrics(analytics);
+    renderBars(analytics.top_posts || []);
+    const trendRows = trends.trending_keywords || [];
+    renderTrendCloud(trendRows);
+    renderTable("topPostsTable", analytics.top_posts || [], [
+      { key: "post_id", label: "Post" },
+      { key: "platform", label: "Platform" },
+      { key: "likes", label: "Likes" },
+      { key: "comments", label: "Comments" },
+      { key: "shares", label: "Shares" },
+      { key: "engagement_rate", label: "Engagement" },
+    ]);
+    renderTable("trendsTable", trendRows, [
+      { key: "keyword", label: "Keyword" },
+      { key: "platform", label: "Platform" },
+      { key: "trend_score", label: "Score" },
+      { key: "trend_category", label: "Category" },
+    ]);
+  } catch (error) {
+    setText("metricStrip", error.message);
+  }
 }
 
-function renderCalendarLane(rows) {
-  document.getElementById("calendarLane").innerHTML = (rows || [])
+function renderCalendarLane(rows = []) {
+  byId("calendarLane").innerHTML = rows
     .slice(0, 6)
     .map(
       (row) => `<article class="schedule-card">
         <strong>${row.platform || "Platform"}</strong>
         <span>${[row.scheduled_date, row.scheduled_time].filter(Boolean).join(" ") || "Scheduled"}</span>
-        <p>${String(row.caption_preview || row.caption || "").slice(0, 96)}</p>
+        <p>${String(row.caption_preview || row.caption || "").slice(0, 115)}</p>
       </article>`
     )
     .join("");
 }
 
 async function loadCalendar() {
-  const data = await api("/api/scheduler/summary");
-  renderCalendarLane(data.pending);
-  renderTable("calendarTable", data.pending, [
-    { key: "post_id", label: "Post" },
-    { key: "platform", label: "Platform" },
-    { key: "scheduled_date", label: "Date" },
-    { key: "scheduled_time", label: "Time" },
-    { key: "status", label: "Status" },
-    { key: "caption_preview", label: "Caption" },
-  ]);
+  try {
+    const data = await api("/api/scheduler");
+    const rows = data.pending || [];
+    renderCalendarLane(rows);
+    renderTable("calendarTable", rows, [
+      { key: "post_id", label: "Post" },
+      { key: "platform", label: "Platform" },
+      { key: "scheduled_date", label: "Date" },
+      { key: "scheduled_time", label: "Time" },
+      { key: "status", label: "Status" },
+      { key: "caption_preview", label: "Caption" },
+    ]);
+  } catch (error) {
+    byId("calendarLane").innerHTML = `<article class="schedule-card"><strong>Error</strong><p>${error.message}</p></article>`;
+  }
 }
 
-document.getElementById("refreshCalendar").addEventListener("click", loadCalendar);
-
-document.getElementById("loginForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  try {
-    const login = await api("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(formJson(event.currentTarget)),
-    });
-    setText("loginOutput", loginSummary(login));
-    setUser(login);
-  } catch (error) {
-    setText("loginOutput", error.message);
-  }
-});
+byId("refreshCalendar").addEventListener("click", loadCalendar);
 
 async function loadCompetitors() {
   try {
-    const competitors = await api("/api/competitors/summary");
+    const competitors = await api("/api/competitors");
     setText("competitorOutput", competitors);
   } catch (error) {
     setText("competitorOutput", error.message);
   }
 }
 
-function renderIntegrationStatus(data) {
+function renderIntegrationStatus(data = {}) {
   const rows = [
     ["Telegram", data.telegram?.configured && data.telegram?.status === "ok", data.telegram?.can_send_messages ? "ready" : "needs chat id"],
-    ["LinkedIn", data.linkedin?.access_token === "configured", data.linkedin?.live_ready ? "ready" : "needs author urn"],
-    ["X", data.x?.bearer_token === "configured", data.x?.live_ready ? "ready" : "read/status only"],
+    ["LinkedIn", data.linkedin?.access_token === "configured" || data.linkedin?.live_ready, data.linkedin?.live_ready ? "ready" : "needs author urn"],
+    ["X", data.x?.bearer_token === "configured" || data.x?.live_ready, data.x?.live_ready ? "ready" : "read/status only"],
   ];
-  document.getElementById("integrationStatus").innerHTML = rows
-    .map(([name, ok, note]) => `<span class="integration-pill ${ok ? "ok" : "warn"}">${name}: ${note}</span>`)
+  byId("integrationStatus").innerHTML = rows
+    .map(([name, ok, note]) => `<span class="integration-pill ${ok ? "ok" : "warn"}"><strong>${name}</strong><span>${note}</span></span>`)
     .join("");
 }
 
 async function loadIntegrations() {
   try {
-    renderIntegrationStatus(await api("/api/integrations/status"));
+    const data = await api("/api/integrations");
+    renderIntegrationStatus(data);
   } catch (error) {
-    document.getElementById("integrationStatus").innerHTML = `<span class="integration-pill warn">${error.message}</span>`;
+    byId("integrationStatus").innerHTML = `<span class="integration-pill warn">${error.message}</span>`;
   }
 }
 
-document.getElementById("publishButton").addEventListener("click", async () => {
+byId("publishButton").addEventListener("click", async () => {
   try {
-    const result = await api("/api/publisher/dry-run", {
+    const result = await api("/api/publish", {
       method: "POST",
       body: JSON.stringify({
-        platform: document.getElementById("publishPlatform").value,
-        caption: document.getElementById("publishCaption").value,
+        platform: platformForApi(byId("publishPlatform").value),
+        caption: byId("publishCaption").value,
+        media_url: byId("publishMediaUrl").value || null,
       }),
     });
     setText("publishOutput", result);
@@ -432,11 +451,11 @@ document.getElementById("publishButton").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("telegramButton").addEventListener("click", async () => {
+byId("telegramButton").addEventListener("click", async () => {
   try {
-    const result = await api("/api/integrations/telegram/send", {
+    const result = await api("/api/telegram", {
       method: "POST",
-      body: JSON.stringify({ message: document.getElementById("publishCaption").value }),
+      body: JSON.stringify({ message: byId("publishCaption").value }),
     });
     setText("publishOutput", result);
   } catch (error) {
