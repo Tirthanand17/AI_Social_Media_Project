@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI Social Studio | Simple Workspace</title>
-  <meta name="description" content="Simple AI social media automation workspace with LLM content generation, prediction, scheduling, approval, feedback, and dry-run publishing." />
-  <link rel="stylesheet" href="/static/styles.css?v=20260619-simple" />
+  <meta name="description" content="Simple AI social media automation workspace with LLM content generation, performance prediction, scheduling, approval, feedback, and dry-run publishing." />
+  <link rel="stylesheet" href="/static/styles.css?v=simple-workflow-v7" />
 </head>
 <body>
   <div class="app-shell">
@@ -14,7 +14,6 @@
         <span class="brand-mark">AS</span>
         <span><strong>AI Social Studio</strong><small>Simple creator workspace</small></span>
       </a>
-
       <nav class="tabs">
         <button class="tab active" data-tab="dashboard"><span>Overview</span></button>
         <button class="tab" data-tab="generate"><span>Create</span></button>
@@ -23,12 +22,10 @@
         <button class="tab" data-tab="calendar"><span>Calendar</span></button>
         <button class="tab" data-tab="admin"><span>Publish</span></button>
       </nav>
-
       <div class="nav-auth" id="sidebarAuth">
         <span class="user-info" id="sidebarUserInfo">Not logged in</span>
         <button class="logout-btn" id="sidebarLoginBtn">Log in</button>
       </div>
-
       <div class="sidebar-card">
         <span class="label">System status</span>
         <strong id="apiStatus">Checking API</strong>
@@ -40,13 +37,12 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Simple AI social media automation</p>
-          <h1>One easy workflow: enter topic, generate with LLM, review, schedule, and dry-run publish.</h1>
+          <h1>One workflow: enter topic, generate with LLM, analyze performance, save, schedule, and publish preview.</h1>
         </div>
         <div class="top-actions">
           <span class="status-pill" id="postingModeBadge">dry_run</span>
           <span class="user-pill" id="userPill">Guest workspace</span>
           <button class="ghost small" id="loginOpen">Log in</button>
-          <button class="ghost small" id="logoutBtn" style="display:none">Log out</button>
           <button class="cta small" data-jump="generate">Create post</button>
         </div>
       </header>
@@ -69,14 +65,13 @@
           <div class="hero-logo-wrap">AS</div>
           <div class="hero-text">
             <h2>Welcome to Simple Mode</h2>
-            <p>This version is easier to use. Start from raw notes, then the system creates caption, hashtags, image prompt, prediction, best time, and dry-run publish preview.</p>
+            <p>The main features are kept, but the workflow is easier: generate content, check performance, save or schedule it, then dry-run publish.</p>
           </div>
           <div class="hero-ctas">
             <button class="cta small" data-jump="generate">Create with LLM</button>
             <button class="ghost small" id="loadBriefButton">Load platform brief</button>
           </div>
         </div>
-
         <div class="feature-row">
           <span class="feature-badge">LLM caption</span>
           <span class="feature-badge">Hashtag engine</span>
@@ -85,14 +80,12 @@
           <span class="feature-badge">SQLite save/schedule</span>
           <span class="feature-badge">Dry-run publisher</span>
         </div>
-
         <div class="metric-strip">
           <article class="metric"><span>Main flow</span><strong>5 steps</strong><em>Generate → Save → Approve → Schedule → Publish</em></article>
           <article class="metric"><span>Platforms</span><strong>4</strong><em>Instagram, Facebook, X, LinkedIn</em></article>
           <article class="metric"><span>Datasets</span><strong id="datasetCount">--</strong><em>Loaded by backend</em></article>
           <article class="metric"><span>Posting mode</span><strong id="postingMode">dry_run</strong><em>Safe by default</em></article>
         </div>
-
         <div class="split-grid command-grid">
           <form class="tool-card form-card command-card" id="rawPostForm">
             <div class="card-head"><div><span>Step 1</span><h3>Generate full package from raw notes</h3></div><button type="submit" class="cta small">Generate package</button></div>
@@ -106,27 +99,17 @@ Audience: creators, small businesses, agencies
 Offer: generate captions, hashtags, image prompts, best time, and dry-run publishing
 CTA: Try the AI workflow today</textarea></label>
           </form>
-
           <article class="tool-card output-card command-output">
             <div class="card-head"><div><span>Generated package</span><h3>Review output</h3></div><b class="status-chip">LLM ready</b></div>
             <pre id="rawPostOutput">Ready. Click Generate package.</pre>
-            <div class="inline-actions" style="margin-top:12px">
-              <button type="button" class="ghost small" id="reviewPackageButton" data-jump="generate">Open in Create</button>
-              <button type="button" class="ghost small" id="publishPackageButton" data-jump="admin">Move to Publisher</button>
-            </div>
           </article>
         </div>
-
         <div class="split-grid dashboard-split">
           <article class="tool-card">
             <div class="card-head"><div><span>Platform brief</span><h3>Content guidance</h3></div><select id="briefPlatform" class="compact-select"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></div>
             <pre id="briefOutput">Click Load platform brief.</pre>
           </article>
-          <article class="tool-card">
-            <span class="label">Platform readiness</span>
-            <h3>API status</h3>
-            <div class="platform-grid" id="platformReadiness"></div>
-          </article>
+          <article class="tool-card"><span class="label">Platform readiness</span><h3>API status</h3><div class="platform-grid" id="platformReadiness"></div></article>
         </div>
       </section>
 
@@ -140,7 +123,6 @@ CTA: Try the AI workflow today</textarea></label>
               <label>Platform<select name="platform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label>
               <label>Tone<select name="tone"><option>engaging</option><option>professional</option><option>casual</option><option>motivational</option></select></label>
             </div>
-            <div class="inline-actions"><button type="button" class="ghost small" id="useBriefButton">Use brief topic</button><button type="button" class="ghost small" id="copyToPublisherButton">Send to publisher</button></div>
           </form>
           <article class="tool-card output-card"><div class="card-head"><div><span>Caption</span><h3>Editable draft</h3></div><b class="status-chip">Ready</b></div><pre id="captionOutput">Ready.</pre></article>
         </div>
@@ -171,15 +153,22 @@ CTA: Try the AI workflow today</textarea></label>
       <section class="workspace" id="analytics">
         <div class="section-title"><p class="eyebrow">Analytics</p><h2>Performance dashboard</h2></div>
         <div class="metric-strip" id="metricStrip"></div>
-        <div class="split-grid">
-          <article class="tool-card"><span class="label">Engagement</span><div class="bar-visual" id="engagementBars"></div></article>
-          <article class="tool-card"><span class="label">Trends</span><div class="trend-cloud" id="trendCloud"></div></article>
-        </div>
+        <div class="split-grid"><article class="tool-card"><span class="label">Engagement</span><div class="bar-visual" id="engagementBars"></div></article><article class="tool-card"><span class="label">Trends</span><div class="trend-cloud" id="trendCloud"></div></article></div>
         <div class="card-grid"><article class="tool-card wide"><h3>Top posts</h3><div class="table-wrap"><table id="topPostsTable"></table></div></article><article class="tool-card wide"><h3>Trending keywords</h3><div class="table-wrap"><table id="trendsTable"></table></div></article></div>
       </section>
 
       <section class="workspace" id="calendar">
-        <div class="section-title split-title"><div><p class="eyebrow">Calendar</p><h2>Save, approve, schedule, and reschedule</h2><p>The connected SQLite workflow card appears below.</p></div><button id="refreshCalendar" class="ghost small">Refresh calendar</button></div>
+        <div class="section-title split-title"><div><p class="eyebrow">Calendar</p><h2>Save, approve, schedule, and reschedule</h2><p>Save your generated caption, edit it, approve it, and schedule it.</p></div><button id="refreshCalendar" class="ghost small">Refresh calendar</button></div>
+        <article class="tool-card wide">
+          <div class="card-head"><div><span>Storage workflow</span><h3>Save, edit, approve, schedule, reschedule</h3></div></div>
+          <div class="grid-2"><label>Post ID<input id="dbPost" type="number" placeholder="Auto after save"></label><label>Title<input id="dbTitle" value="AI Social Studio post"></label></div>
+          <label>Editable caption<textarea id="dbCaption" rows="5">AI automation test caption #AI</textarea></label>
+          <div class="grid-2"><label>Platform<select id="dbPlatform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label><label>Hashtags<input id="dbTags" value="#AI #Automation"></label></div>
+          <div class="grid-2"><label>Date<input id="dbDate" type="date"></label><label>Time<input id="dbTime" type="time" value="19:00"></label></div>
+          <label>Reason for reschedule<input id="dbReason" value="Better engagement slot"></label>
+          <div class="inline-actions"><button class="cta small" id="savePost">Save post</button><button class="ghost small" id="editPost">Edit post</button><button class="ghost small" id="submitPost">Submit approval</button><button class="cta small" id="schedulePost">Schedule</button><button class="ghost small" id="reschedulePost">Reschedule</button></div>
+          <pre id="dbOut">Ready. Generate a caption first, then save and schedule.</pre>
+        </article>
         <article class="tool-card"><div class="card-head"><div><span>Schedule history</span><h3>Content calendar</h3></div><b class="status-chip">SQLite</b></div><div class="calendar-lane" id="calendarLane"></div><div class="table-wrap"><table id="calendarTable"></table></div></article>
       </section>
 
@@ -187,14 +176,14 @@ CTA: Try the AI workflow today</textarea></label>
         <div class="section-title"><p class="eyebrow">Publish</p><h2>Dry-run publisher, approval, and feedback</h2><p>Facebook and Instagram live posting can be added later when credentials are ready.</p></div>
         <div class="card-grid">
           <form class="tool-card" id="loginForm"><div class="card-head"><div><span>Access</span><h3>Role login</h3></div><button type="submit" class="cta small">Login</button></div><div class="grid-2"><label>Username<input name="username" value="admin_techcreate" /></label><label>Password<input name="password" type="password" value="admin123" /></label></div><pre id="loginOutput">Not logged in.</pre></form>
-          <article class="tool-card"><span class="label">Connections</span><h3>API connections</h3><div class="integration-grid" id="integrationStatus"></div></article>
+          <article class="tool-card"><span class="label">Connections</span><h3>API connections</h3><pre id="integrationStatus">Ready.</pre></article>
           <article class="tool-card"><span class="label">Competitors</span><h3>Competitor alerts</h3><pre id="competitorOutput">Ready.</pre></article>
-          <article class="tool-card wide"><div class="card-head"><div><span>Publisher</span><h3>Dry-run publish preview</h3></div><b class="status-chip">Safe mode</b></div><div class="grid-2"><label>Platform<select id="publishPlatform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label><label>Media URL<input id="publishMediaUrl" placeholder="https://example.com/image.png" /></label></div><label>Caption<textarea id="publishCaption" rows="5">AI automation test caption #AI</textarea></label><div class="inline-actions"><button id="publishButton" class="cta small">Dry-run publish</button><button id="telegramButton" class="ghost small">Telegram test</button></div><pre id="publishOutput">Ready.</pre></article>
+          <article class="tool-card wide"><div class="card-head"><div><span>Publisher</span><h3>Dry-run publish preview</h3></div><b class="status-chip">No accidental live post</b></div><div class="grid-2"><label>Platform<select id="publishPlatform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label><label>Media URL, optional<input id="publishMediaUrl" placeholder="https://example.com/image.png" /></label></div><label>Caption<textarea id="publishCaption" rows="5">AI automation test caption #AI</textarea></label><button id="publishButton" class="cta small">Dry-run publish</button><pre id="publishOutput">Ready.</pre></article>
+          <article class="tool-card wide"><div class="card-head"><div><span>Feedback + approval</span><h3>Store result feedback</h3></div></div><div class="grid-2"><label>Post ID<input id="apPost" type="number" placeholder="Saved post ID"></label><label>Rating<input id="reviewRating" type="number" min="1" max="5" value="5"></label></div><label>Feedback notes<textarea id="reviewNotes" rows="4">Good caption and timing.</textarea></label><div class="inline-actions"><button class="cta small" id="saveFeedback">Save feedback</button><button class="ghost small" id="loadFeedback">Load feedback</button></div><pre id="reviewOut">Ready.</pre></article>
         </div>
       </section>
     </main>
   </div>
-
-  <script src="/static/app.js?v=20260619-simple"></script>
+  <script src="/static/simple_app.js?v=simple-workflow-v7"></script>
 </body>
 </html>
