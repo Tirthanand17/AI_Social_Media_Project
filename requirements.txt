@@ -9,6 +9,7 @@ pydantic
 streamlit
 plotly
 requests
+requests-oauthlib
 google-genai
 groq
 xgboost
