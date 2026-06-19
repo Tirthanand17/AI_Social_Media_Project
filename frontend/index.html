@@ -1,633 +1,200 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AI Social Studio | Social Media Automation Workspace</title>
-    <meta
-      name="description"
-      content="AI-powered social media content creation, trend analysis, engagement prediction, scheduling, and publishing dashboard."
-    />
-    <link rel="stylesheet" href="/static/styles.css?v=2.0" />
-  </head>
-  <body>
-    <div class="app-shell">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Social Studio | Simple Workspace</title>
+  <meta name="description" content="Simple AI social media automation workspace with LLM content generation, prediction, scheduling, approval, feedback, and dry-run publishing." />
+  <link rel="stylesheet" href="/static/styles.css?v=20260619-simple" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#dashboard" aria-label="AI Social Studio">
+        <span class="brand-mark">AS</span>
+        <span><strong>AI Social Studio</strong><small>Simple creator workspace</small></span>
+      </a>
 
-      <!-- ══════════════════════════════════════════
-           SIDEBAR NAVIGATION
-      ══════════════════════════════════════════ -->
-      <aside class="sidebar" aria-label="Main navigation">
+      <nav class="tabs">
+        <button class="tab active" data-tab="dashboard"><span>Overview</span></button>
+        <button class="tab" data-tab="generate"><span>Create</span></button>
+        <button class="tab" data-tab="predict"><span>Predict</span></button>
+        <button class="tab" data-tab="analytics"><span>Analytics</span></button>
+        <button class="tab" data-tab="calendar"><span>Calendar</span></button>
+        <button class="tab" data-tab="admin"><span>Publish</span></button>
+      </nav>
 
-        <!-- Brand / Logo -->
-        <a class="brand" href="#dashboard" aria-label="AI Social Studio">
-          <span class="brand-mark">AS</span>
-          <span>
-            <strong>AI Social Studio</strong>
-            <small>Creator operations</small>
-          </span>
-        </a>
+      <div class="nav-auth" id="sidebarAuth">
+        <span class="user-info" id="sidebarUserInfo">Not logged in</span>
+        <button class="logout-btn" id="sidebarLoginBtn">Log in</button>
+      </div>
 
-        <!-- Nav tabs -->
-        <nav class="tabs">
-          <button class="tab active" data-tab="dashboard"><span>Overview</span></button>
-          <button class="tab" data-tab="generate"><span>Create</span></button>
-          <button class="tab" data-tab="predict"><span>Predict</span></button>
-          <button class="tab" data-tab="analytics"><span>Analytics</span></button>
-          <button class="tab" data-tab="calendar"><span>Calendar</span></button>
-          <button class="tab" data-tab="admin"><span>Publish</span></button>
-        </nav>
+      <div class="sidebar-card">
+        <span class="label">System status</span>
+        <strong id="apiStatus">Checking API</strong>
+        <p>Simple mode: Generate → Save → Schedule → Publish dry-run.</p>
+      </div>
+    </aside>
 
-        <!-- Login / Logout section in sidebar -->
-        <div class="nav-auth" id="sidebarAuth">
-          <!-- Populated by JS: shows "Log in" button or user + logout -->
-          <span class="user-info" id="sidebarUserInfo">Not logged in</span>
-          <button class="logout-btn" id="sidebarLoginBtn">Log in</button>
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Simple AI social media automation</p>
+          <h1>One easy workflow: enter topic, generate with LLM, review, schedule, and dry-run publish.</h1>
+        </div>
+        <div class="top-actions">
+          <span class="status-pill" id="postingModeBadge">dry_run</span>
+          <span class="user-pill" id="userPill">Guest workspace</span>
+          <button class="ghost small" id="loginOpen">Log in</button>
+          <button class="ghost small" id="logoutBtn" style="display:none">Log out</button>
+          <button class="cta small" data-jump="generate">Create post</button>
+        </div>
+      </header>
+
+      <section class="login-modal" id="loginModal" aria-hidden="true">
+        <form class="login-card" id="topLoginForm">
+          <button type="button" class="close-login" id="loginClose" aria-label="Close login">×</button>
+          <span class="label">Demo login</span>
+          <h2>Log in</h2>
+          <p>Use demo credentials for local testing.</p>
+          <label>Username<input name="username" value="admin_techcreate" autocomplete="username" /></label>
+          <label>Password<input name="password" type="password" value="admin123" autocomplete="current-password" /></label>
+          <button type="submit" class="cta full">Log in</button>
+          <pre id="topLoginOutput">Not logged in.</pre>
+        </form>
+      </section>
+
+      <section class="workspace active" id="dashboard">
+        <div class="hero-banner">
+          <div class="hero-logo-wrap">AS</div>
+          <div class="hero-text">
+            <h2>Welcome to Simple Mode</h2>
+            <p>This version is easier to use. Start from raw notes, then the system creates caption, hashtags, image prompt, prediction, best time, and dry-run publish preview.</p>
+          </div>
+          <div class="hero-ctas">
+            <button class="cta small" data-jump="generate">Create with LLM</button>
+            <button class="ghost small" id="loadBriefButton">Load platform brief</button>
+          </div>
         </div>
 
-        <!-- System status card -->
-        <div class="sidebar-card">
-          <span class="label">System status</span>
-          <strong id="apiStatus">Checking API</strong>
-          <p>Local prototype with safe dry-run publishing by default.</p>
+        <div class="feature-row">
+          <span class="feature-badge">LLM caption</span>
+          <span class="feature-badge">Hashtag engine</span>
+          <span class="feature-badge">Image prompt</span>
+          <span class="feature-badge">ML prediction</span>
+          <span class="feature-badge">SQLite save/schedule</span>
+          <span class="feature-badge">Dry-run publisher</span>
         </div>
 
-      </aside>
+        <div class="metric-strip">
+          <article class="metric"><span>Main flow</span><strong>5 steps</strong><em>Generate → Save → Approve → Schedule → Publish</em></article>
+          <article class="metric"><span>Platforms</span><strong>4</strong><em>Instagram, Facebook, X, LinkedIn</em></article>
+          <article class="metric"><span>Datasets</span><strong id="datasetCount">--</strong><em>Loaded by backend</em></article>
+          <article class="metric"><span>Posting mode</span><strong id="postingMode">dry_run</strong><em>Safe by default</em></article>
+        </div>
 
-      <!-- ══════════════════════════════════════════
-           MAIN CONTENT AREA
-      ══════════════════════════════════════════ -->
-      <main class="main-panel">
-
-        <!-- ── Top bar ────────────────────────────────────── -->
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">AI-powered social media intelligence platform</p>
-            <h1>Plan, generate, score, schedule, and publish posts from raw campaign data.</h1>
-          </div>
-          <div class="top-actions">
-            <span class="status-pill" id="postingModeBadge">dry_run</span>
-            <span class="user-pill" id="userPill">Guest workspace</span>
-            <!-- Login / Logout toggle rendered by JS -->
-            <button class="ghost small" id="loginOpen">Log in</button>
-            <button class="ghost small" id="logoutBtn" style="display:none">Log out</button>
-            <button class="cta small" data-jump="generate">Create post</button>
-          </div>
-        </header>
-
-        <!-- ── Login modal ────────────────────────────────── -->
-        <section class="login-modal" id="loginModal" aria-hidden="true">
-          <form class="login-card" id="topLoginForm">
-            <button type="button" class="close-login" id="loginClose" aria-label="Close login">×</button>
-            <span class="label">Secure workspace</span>
-            <h2>Log in to AI Social Studio</h2>
-            <p>Use the demo account while running locally. Disable demo login before production deployment.</p>
-            <label>
-              Username
-              <input name="username" value="admin_techcreate" autocomplete="username" />
-            </label>
-            <label>
-              Password
-              <input name="password" type="password" value="admin123" autocomplete="current-password" />
-            </label>
-            <button type="submit" class="cta full">Log in</button>
-            <pre id="topLoginOutput">Not logged in.</pre>
+        <div class="split-grid command-grid">
+          <form class="tool-card form-card command-card" id="rawPostForm">
+            <div class="card-head"><div><span>Step 1</span><h3>Generate full package from raw notes</h3></div><button type="submit" class="cta small">Generate package</button></div>
+            <label>Campaign goal<input name="campaign_goal" value="Create a high-engagement social media post" /></label>
+            <div class="grid-2">
+              <label>Platform<select name="platform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label>
+              <label>Tone<select name="tone"><option>engaging</option><option>professional</option><option>casual</option><option>motivational</option></select></label>
+            </div>
+            <label>Raw notes<textarea name="raw_text" rows="8">Product: AI Social Studio
+Audience: creators, small businesses, agencies
+Offer: generate captions, hashtags, image prompts, best time, and dry-run publishing
+CTA: Try the AI workflow today</textarea></label>
           </form>
-        </section>
 
-        <!-- ══════════════════════════════════════════
-             SECTION 1 — DASHBOARD / HOME
-        ══════════════════════════════════════════ -->
-        <section class="workspace active" id="dashboard">
-
-          <!-- Hero welcome banner -->
-          <div class="hero-banner">
-            <div class="hero-logo-wrap" aria-hidden="true">AS</div>
-            <div class="hero-text">
-              <h2>Welcome to AI Social Studio</h2>
-              <p>Turn raw campaign notes into publish-ready social media packages in seconds — powered by AI, ML, and real analytics data.</p>
+          <article class="tool-card output-card command-output">
+            <div class="card-head"><div><span>Generated package</span><h3>Review output</h3></div><b class="status-chip">LLM ready</b></div>
+            <pre id="rawPostOutput">Ready. Click Generate package.</pre>
+            <div class="inline-actions" style="margin-top:12px">
+              <button type="button" class="ghost small" id="reviewPackageButton" data-jump="generate">Open in Create</button>
+              <button type="button" class="ghost small" id="publishPackageButton" data-jump="admin">Move to Publisher</button>
             </div>
-            <div class="hero-ctas">
-              <button class="cta small" data-jump="generate">✦ Create a post</button>
-              <button class="ghost small" id="loadBriefButton">Load platform brief</button>
-            </div>
-          </div>
-
-          <!-- Feature highlight row -->
-          <div class="feature-row">
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-              Best-time scheduling
-            </span>
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h12M8 2l4 6-4 6"/></svg>
-              AI caption generation
-            </span>
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="12" height="12" rx="3"/><path d="M5 8h6M5 11h4"/></svg>
-              Hashtag engine
-            </span>
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 13L6 7l3 4 2-3 3 5"/></svg>
-              ML engagement score
-            </span>
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M4 6h8M3 10h10"/></svg>
-              Dry-run publisher
-            </span>
-            <span class="feature-badge">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-              4 platforms
-            </span>
-          </div>
-
-          <!-- Section title row (quick actions moved to hero) -->
-          <div class="section-title split-title">
-            <div>
-              <p class="eyebrow">Command center</p>
-              <h2>Turn raw notes into a complete social media post package</h2>
-              <p>
-                Built for Instagram, Facebook, X, and LinkedIn. The workflow combines trend data, NLP, ML engagement scoring,
-                moderation, scheduling, and publisher readiness in one professional dashboard.
-              </p>
-            </div>
-            <div class="quick-actions">
-              <button class="cta small" data-jump="admin">Check integrations</button>
-            </div>
-          </div>
-
-          <!-- Metric strip -->
-          <div class="metric-strip">
-            <article class="metric"><span>Workflow</span><strong>5 steps</strong><em>Data → AI → ML → Approval → Publish</em></article>
-            <article class="metric"><span>Platforms</span><strong>4</strong><em>Instagram, Facebook, X, LinkedIn</em></article>
-            <article class="metric"><span>Datasets</span><strong id="datasetCount">--</strong><em>CSV-backed prototype data</em></article>
-            <article class="metric"><span>Posting mode</span><strong id="postingMode">dry_run</strong><em>Safe local publishing</em></article>
-          </div>
-
-          <!-- Workflow step cards -->
-          <div class="workflow-grid">
-            <article class="workflow-card"><b>1</b><h3>Collect signals</h3><p>Read trends, analytics, competitors, captions, schedule, best-time, and user role data.</p></article>
-            <article class="workflow-card"><b>2</b><h3>Generate assets</h3><p>Create captions, hashtags, and image/video prompts for each target platform.</p></article>
-            <article class="workflow-card"><b>3</b><h3>Validate quality</h3><p>Run moderation, originality checks, and engagement prediction before posting.</p></article>
-            <article class="workflow-card"><b>4</b><h3>Schedule approval</h3><p>Recommend the best posting time and prepare the content calendar queue.</p></article>
-            <article class="workflow-card"><b>5</b><h3>Publish safely</h3><p>Use dry-run preview first, then connect real platform APIs for live posting.</p></article>
-          </div>
-
-          <!-- Raw data studio + output -->
-          <div class="split-grid command-grid">
-            <form class="tool-card form-card command-card" id="rawPostForm">
-              <div class="card-head">
-                <div>
-                  <span>Raw data studio</span>
-                  <h3>Generate a publish-ready package</h3>
-                </div>
-                <button type="submit" class="cta small">Generate package</button>
-              </div>
-              <label>
-                Campaign goal
-                <input name="campaign_goal" value="Turn product notes into a high-engagement social post" />
-              </label>
-              <div class="grid-2">
-                <label>
-                  Platform
-                  <select name="platform">
-                    <option>Instagram</option>
-                    <option>Facebook</option>
-                    <option>X</option>
-                    <option>LinkedIn</option>
-                  </select>
-                </label>
-                <label>
-                  Tone
-                  <select name="tone">
-                    <option>professional</option>
-                    <option>engaging</option>
-                    <option>casual</option>
-                    <option>motivational</option>
-                  </select>
-                </label>
-              </div>
-              <label>
-                Raw campaign notes
-                <textarea name="raw_text" rows="8">Product: AI Social Studio
-Audience: creators, agencies, small businesses, and educational brands
-Offer: generate captions, hashtags, image prompts, best posting time, and dry-run publishing from raw notes
-Proof: uses analytics and trend datasets to save planning time and improve content consistency</textarea>
-              </label>
-            </form>
-
-            <article class="tool-card output-card command-output">
-              <div class="card-head">
-                <div>
-                  <span>Approval package</span>
-                  <h3>Ready for review</h3>
-                </div>
-                <b class="status-chip">Dry-run safe</b>
-              </div>
-              <pre id="rawPostOutput">Ready. Add raw campaign notes and generate a package.</pre>
-              <div class="inline-actions package-actions" style="margin-top:12px">
-                <button type="button" class="ghost small" id="reviewPackageButton">Open in Create</button>
-                <button type="button" class="ghost small" id="publishPackageButton">Move to Publisher</button>
-              </div>
-            </article>
-          </div>
-
-          <!-- Platform brief + readiness -->
-          <div class="split-grid dashboard-split">
-            <article class="tool-card">
-              <div class="card-head">
-                <div>
-                  <span>Platform intelligence</span>
-                  <h3>Raw-data brief</h3>
-                </div>
-                <select id="briefPlatform" class="compact-select">
-                  <option>Instagram</option>
-                  <option>Facebook</option>
-                  <option>X</option>
-                  <option>LinkedIn</option>
-                </select>
-              </div>
-              <pre id="briefOutput">Click "Load platform brief" to view trending topics, best time, and caption references.</pre>
-            </article>
-            <article class="tool-card">
-              <span class="label">Platform readiness</span>
-              <h3>Publishing status</h3>
-              <div class="platform-grid" id="platformReadiness"></div>
-            </article>
-          </div>
-
-        </section>
-        <!-- /dashboard -->
-
-        <!-- ══════════════════════════════════════════
-             SECTION 2 — CREATE / GENERATE
-        ══════════════════════════════════════════ -->
-        <section class="workspace" id="generate">
-          <div class="section-title">
-            <p class="eyebrow">Creator studio</p>
-            <h2>Generate captions, hashtags, and creative prompts</h2>
-            <p>Use this section after the raw-data package, or create content directly from a topic.</p>
-          </div>
-          <div class="split-grid">
-            <form class="tool-card form-card" id="generateForm">
-              <div class="card-head">
-                <div>
-                  <span>AI writer</span>
-                  <h3>Create a post</h3>
-                </div>
-                <button type="submit" class="cta small">Generate</button>
-              </div>
-              <label>
-                Topic
-                <input name="topic" value="AI Social Media Automation for creators" required />
-              </label>
-              <div class="grid-2">
-                <label>
-                  Platform
-                  <select name="platform">
-                    <option>Instagram</option>
-                    <option>Facebook</option>
-                    <option>X</option>
-                    <option>LinkedIn</option>
-                  </select>
-                </label>
-                <label>
-                  Tone
-                  <select name="tone">
-                    <option>engaging</option>
-                    <option>professional</option>
-                    <option>casual</option>
-                    <option>motivational</option>
-                  </select>
-                </label>
-              </div>
-              <div class="inline-actions">
-                <button type="button" class="ghost small" id="useBriefButton">Use brief topic</button>
-                <button type="button" class="ghost small" id="copyToPublisherButton">Send to publisher</button>
-              </div>
-            </form>
-
-            <article class="tool-card output-card">
-              <div class="card-head">
-                <div>
-                  <span>Draft caption</span>
-                  <h3>AI output</h3>
-                </div>
-                <b class="status-chip">Editable</b>
-              </div>
-              <pre id="captionOutput">Ready.</pre>
-            </article>
-          </div>
-
-          <div class="card-grid">
-            <article class="tool-card">
-              <span class="label">Hashtag engine</span>
-              <h3>Suggested tags</h3>
-              <p id="hashtagOutput">Ready.</p>
-            </article>
-            <article class="tool-card">
-              <span class="label">Safety check</span>
-              <h3>Moderation and originality</h3>
-              <pre id="safetyOutput">Ready.</pre>
-            </article>
-            <article class="tool-card wide">
-              <span class="label">Creative asset brief</span>
-              <h3>Image or short-video prompt</h3>
-              <pre id="imagePromptOutput">Ready.</pre>
-            </article>
-          </div>
-        </section>
-
-        <!-- ══════════════════════════════════════════
-             SECTION 3 — PREDICT
-        ══════════════════════════════════════════ -->
-        <section class="workspace" id="predict">
-          <div class="section-title">
-            <p class="eyebrow">ML quality gate</p>
-            <h2>Predict engagement before publishing</h2>
-            <p>Estimate content performance using platform, format, timing, caption, hashtags, and media signal inputs.</p>
-          </div>
-          <div class="split-grid">
-            <form class="tool-card form-card" id="predictForm">
-              <div class="card-head">
-                <div>
-                  <span>Score a caption</span>
-                  <h3>Prediction inputs</h3>
-                </div>
-                <button type="submit" class="cta small">Score post</button>
-              </div>
-              <label>
-                Caption
-                <textarea name="caption" rows="6">Want to save 5 hours every week? Try AI automation today. #AI #Automation</textarea>
-              </label>
-              <div class="grid-4">
-                <label>
-                  Platform
-                  <select name="platform">
-                    <option>Instagram</option>
-                    <option>Facebook</option>
-                    <option>X</option>
-                    <option>LinkedIn</option>
-                  </select>
-                </label>
-                <label>
-                  Format
-                  <select name="content_type">
-                    <option>reel</option>
-                    <option>carousel</option>
-                    <option>image</option>
-                    <option>video</option>
-                    <option>text</option>
-                  </select>
-                </label>
-                <label>
-                  Day
-                  <select name="day_of_week">
-                    <option>Friday</option>
-                    <option>Monday</option>
-                    <option>Tuesday</option>
-                    <option>Wednesday</option>
-                    <option>Thursday</option>
-                    <option>Saturday</option>
-                    <option>Sunday</option>
-                  </select>
-                </label>
-                <label>
-                  Hour
-                  <input name="hour_posted" type="number" min="0" max="23" value="19" />
-                </label>
-              </div>
-            </form>
-            <article class="tool-card score-card">
-              <span class="label">Engagement signal</span>
-              <div class="score-ring" id="predictionGauge"><span>--</span></div>
-              <pre id="predictionOutput">Ready.</pre>
-            </article>
-          </div>
-        </section>
-
-        <!-- ══════════════════════════════════════════
-             SECTION 4 — ANALYTICS
-        ══════════════════════════════════════════ -->
-        <section class="workspace" id="analytics">
-          <div class="section-title">
-            <p class="eyebrow">Performance intelligence</p>
-            <h2>Analytics dashboard</h2>
-            <p>Monitor reach, likes, comments, shares, engagement rate, and trend signals from the raw analytics dataset.</p>
-          </div>
-          <div class="metric-strip" id="metricStrip"></div>
-          <div class="split-grid">
-            <article class="tool-card">
-              <span class="label">Engagement stream</span>
-              <div class="bar-visual" id="engagementBars"></div>
-            </article>
-            <article class="tool-card">
-              <span class="label">Trend radar</span>
-              <div class="trend-cloud" id="trendCloud"></div>
-            </article>
-          </div>
-          <div class="card-grid">
-            <article class="tool-card wide">
-              <h3>Top posts</h3>
-              <div class="table-wrap"><table id="topPostsTable"></table></div>
-            </article>
-            <article class="tool-card wide">
-              <h3>Trending keywords</h3>
-              <div class="table-wrap"><table id="trendsTable"></table></div>
-            </article>
-          </div>
-        </section>
-
-        <!-- ══════════════════════════════════════════
-             SECTION 5 — CALENDAR
-        ══════════════════════════════════════════ -->
-        <section class="workspace" id="calendar">
-          <div class="section-title split-title">
-            <div>
-              <p class="eyebrow">Planning board</p>
-              <h2>Automatic post scheduling</h2>
-              <p>Review pending scheduled posts and keep the approval queue organized.</p>
-            </div>
-            <button id="refreshCalendar" class="ghost small">Refresh calendar</button>
-          </div>
-          <article class="tool-card">
-            <div class="card-head">
-              <div>
-                <span>Queue</span>
-                <h3>Content calendar</h3>
-              </div>
-              <b class="status-chip">Pending posts</b>
-            </div>
-            <div class="calendar-lane" id="calendarLane"></div>
-            <div class="table-wrap"><table id="calendarTable"></table></div>
           </article>
-        </section>
+        </div>
 
-        <!-- ══════════════════════════════════════════
-             SECTION 6 — PUBLISH / ADMIN
-        ══════════════════════════════════════════ -->
-        <section class="workspace" id="admin">
-          <div class="section-title">
-            <p class="eyebrow">Publishing control room</p>
-            <h2>Login, integrations, competitors, and dry-run publisher</h2>
-            <p>Use this area to verify platform readiness and test a safe publish preview before adding live API credentials.</p>
-          </div>
-          <div class="card-grid">
+        <div class="split-grid dashboard-split">
+          <article class="tool-card">
+            <div class="card-head"><div><span>Platform brief</span><h3>Content guidance</h3></div><select id="briefPlatform" class="compact-select"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></div>
+            <pre id="briefOutput">Click Load platform brief.</pre>
+          </article>
+          <article class="tool-card">
+            <span class="label">Platform readiness</span>
+            <h3>API status</h3>
+            <div class="platform-grid" id="platformReadiness"></div>
+          </article>
+        </div>
+      </section>
 
-            <!-- Role login card (original, untouched) -->
-            <form class="tool-card" id="loginForm">
-              <div class="card-head">
-                <div>
-                  <span>Access control</span>
-                  <h3>Role login</h3>
-                </div>
-                <button type="submit" class="cta small">Login</button>
-              </div>
-              <div class="grid-2">
-                <label>
-                  Username
-                  <input name="username" value="admin_techcreate" />
-                </label>
-                <label>
-                  Password
-                  <input name="password" type="password" value="admin123" />
-                </label>
-              </div>
-              <pre id="loginOutput">Not logged in.</pre>
-            </form>
+      <section class="workspace" id="generate">
+        <div class="section-title"><p class="eyebrow">Create</p><h2>Generate caption, hashtags, safety check, and image prompt</h2><p>Use Gemini/Groq/local fallback based on your configured API keys.</p></div>
+        <div class="split-grid">
+          <form class="tool-card form-card" id="generateForm">
+            <div class="card-head"><div><span>LLM writer</span><h3>Generate post</h3></div><button type="submit" class="cta small">Generate</button></div>
+            <label>Topic<input name="topic" value="AI Social Media Automation for creators" required /></label>
+            <div class="grid-2">
+              <label>Platform<select name="platform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label>
+              <label>Tone<select name="tone"><option>engaging</option><option>professional</option><option>casual</option><option>motivational</option></select></label>
+            </div>
+            <div class="inline-actions"><button type="button" class="ghost small" id="useBriefButton">Use brief topic</button><button type="button" class="ghost small" id="copyToPublisherButton">Send to publisher</button></div>
+          </form>
+          <article class="tool-card output-card"><div class="card-head"><div><span>Caption</span><h3>Editable draft</h3></div><b class="status-chip">Ready</b></div><pre id="captionOutput">Ready.</pre></article>
+        </div>
+        <div class="card-grid">
+          <article class="tool-card"><span class="label">Hashtags</span><h3>Suggested tags</h3><p id="hashtagOutput">Ready.</p></article>
+          <article class="tool-card"><span class="label">Safety</span><h3>Moderation and originality</h3><pre id="safetyOutput">Ready.</pre></article>
+          <article class="tool-card wide"><span class="label">Image generator</span><h3>Prompt package</h3><pre id="imagePromptOutput">Ready.</pre></article>
+        </div>
+      </section>
 
-            <!-- API connections -->
-            <article class="tool-card">
-              <span class="label">Status</span>
-              <h3>API connections</h3>
-              <div class="integration-grid" id="integrationStatus"></div>
-            </article>
+      <section class="workspace" id="predict">
+        <div class="section-title"><p class="eyebrow">Predict</p><h2>Estimate engagement before publishing</h2></div>
+        <div class="split-grid">
+          <form class="tool-card form-card" id="predictForm">
+            <div class="card-head"><div><span>ML input</span><h3>Score a caption</h3></div><button type="submit" class="cta small">Score post</button></div>
+            <label>Caption<textarea name="caption" rows="6">Want to save time with AI automation? #AI #Automation</textarea></label>
+            <div class="grid-4">
+              <label>Platform<select name="platform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label>
+              <label>Format<select name="content_type"><option>reel</option><option>carousel</option><option>image</option><option>video</option><option>text</option></select></label>
+              <label>Day<select name="day_of_week"><option>Friday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Saturday</option><option>Sunday</option></select></label>
+              <label>Hour<input name="hour_posted" type="number" min="0" max="23" value="19" /></label>
+            </div>
+          </form>
+          <article class="tool-card score-card"><span class="label">Score</span><div class="score-ring" id="predictionGauge"><span>--</span></div><pre id="predictionOutput">Ready.</pre></article>
+        </div>
+      </section>
 
-            <!-- Competitor alerts -->
-            <article class="tool-card">
-              <span class="label">Watchlist</span>
-              <h3>Competitor alerts</h3>
-              <pre id="competitorOutput">Ready.</pre>
-            </article>
+      <section class="workspace" id="analytics">
+        <div class="section-title"><p class="eyebrow">Analytics</p><h2>Performance dashboard</h2></div>
+        <div class="metric-strip" id="metricStrip"></div>
+        <div class="split-grid">
+          <article class="tool-card"><span class="label">Engagement</span><div class="bar-visual" id="engagementBars"></div></article>
+          <article class="tool-card"><span class="label">Trends</span><div class="trend-cloud" id="trendCloud"></div></article>
+        </div>
+        <div class="card-grid"><article class="tool-card wide"><h3>Top posts</h3><div class="table-wrap"><table id="topPostsTable"></table></div></article><article class="tool-card wide"><h3>Trending keywords</h3><div class="table-wrap"><table id="trendsTable"></table></div></article></div>
+      </section>
 
-            <!-- Dry-run publisher -->
-            <article class="tool-card wide">
-              <div class="card-head">
-                <div>
-                  <span>Publisher</span>
-                  <h3>Dry-run publish preview</h3>
-                </div>
-                <b class="status-chip">No accidental live post</b>
-              </div>
-              <div class="grid-2">
-                <label>
-                  Platform
-                  <select id="publishPlatform">
-                    <option>Instagram</option>
-                    <option>Facebook</option>
-                    <option>X</option>
-                    <option>LinkedIn</option>
-                  </select>
-                </label>
-                <label>
-                  Media URL, optional
-                  <input id="publishMediaUrl" placeholder="https://example.com/image.png" />
-                </label>
-              </div>
-              <label>
-                Caption
-                <textarea id="publishCaption" rows="5">AI automation test caption #AI</textarea>
-              </label>
-              <div class="inline-actions">
-                <button id="publishButton" class="cta small">Dry-run publish</button>
-                <button id="telegramButton" class="ghost small">Telegram test</button>
-              </div>
-              <pre id="publishOutput">Ready.</pre>
-            </article>
+      <section class="workspace" id="calendar">
+        <div class="section-title split-title"><div><p class="eyebrow">Calendar</p><h2>Save, approve, schedule, and reschedule</h2><p>The connected SQLite workflow card appears below.</p></div><button id="refreshCalendar" class="ghost small">Refresh calendar</button></div>
+        <article class="tool-card"><div class="card-head"><div><span>Schedule history</span><h3>Content calendar</h3></div><b class="status-chip">SQLite</b></div><div class="calendar-lane" id="calendarLane"></div><div class="table-wrap"><table id="calendarTable"></table></div></article>
+      </section>
 
-          </div>
-        </section>
+      <section class="workspace" id="admin">
+        <div class="section-title"><p class="eyebrow">Publish</p><h2>Dry-run publisher, approval, and feedback</h2><p>Facebook and Instagram live posting can be added later when credentials are ready.</p></div>
+        <div class="card-grid">
+          <form class="tool-card" id="loginForm"><div class="card-head"><div><span>Access</span><h3>Role login</h3></div><button type="submit" class="cta small">Login</button></div><div class="grid-2"><label>Username<input name="username" value="admin_techcreate" /></label><label>Password<input name="password" type="password" value="admin123" /></label></div><pre id="loginOutput">Not logged in.</pre></form>
+          <article class="tool-card"><span class="label">Connections</span><h3>API connections</h3><div class="integration-grid" id="integrationStatus"></div></article>
+          <article class="tool-card"><span class="label">Competitors</span><h3>Competitor alerts</h3><pre id="competitorOutput">Ready.</pre></article>
+          <article class="tool-card wide"><div class="card-head"><div><span>Publisher</span><h3>Dry-run publish preview</h3></div><b class="status-chip">Safe mode</b></div><div class="grid-2"><label>Platform<select id="publishPlatform"><option>Instagram</option><option>Facebook</option><option>X</option><option>LinkedIn</option></select></label><label>Media URL<input id="publishMediaUrl" placeholder="https://example.com/image.png" /></label></div><label>Caption<textarea id="publishCaption" rows="5">AI automation test caption #AI</textarea></label><div class="inline-actions"><button id="publishButton" class="cta small">Dry-run publish</button><button id="telegramButton" class="ghost small">Telegram test</button></div><pre id="publishOutput">Ready.</pre></article>
+        </div>
+      </section>
+    </main>
+  </div>
 
-      </main>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         INLINE ENHANCEMENT SCRIPT
-         Adds logout, sidebar auth, avatar — does NOT
-         touch any of the original app.js logic.
-    ══════════════════════════════════════════ -->
-    <script>
-      // ── Sidebar auth panel ────────────────────────────────
-      function updateSidebarAuth(user) {
-        const info = document.getElementById("sidebarUserInfo");
-        const btn  = document.getElementById("sidebarLoginBtn");
-        if (user) {
-          info.textContent = user.role ? `${user.role}: ${user.username}` : user.username;
-          btn.textContent  = "Log out";
-          btn.classList.add("logout-btn");
-          btn.onclick = handleLogout;
-        } else {
-          info.textContent = "Not logged in";
-          btn.textContent  = "Log in";
-          btn.classList.remove("logout-btn");
-          btn.onclick = openLogin;
-        }
-      }
-
-      // ── Logout handler ────────────────────────────────────
-      function handleLogout() {
-        window._currentUser = null;
-        const userPill = document.getElementById("userPill");
-        if (userPill) userPill.textContent = "Guest workspace";
-
-        const loginBtn  = document.getElementById("loginOpen");
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (loginBtn)  loginBtn.style.display  = "";
-        if (logoutBtn) logoutBtn.style.display = "none";
-
-        // Reset avatar if present
-        const avatar = document.querySelector(".avatar-ring");
-        if (avatar) avatar.remove();
-
-        updateSidebarAuth(null);
-      }
-
-      // ── Patch setUser so we can hook into it ─────────────
-      // We wait for app.js to load then wrap the existing setUser
-      window.addEventListener("load", () => {
-        // Expose logout button
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
-
-        // Also wire sidebar login btn initially
-        const sidebarBtn = document.getElementById("sidebarLoginBtn");
-        if (sidebarBtn) sidebarBtn.onclick = openLogin; // openLogin defined in app.js
-
-        // Watch for login events via MutationObserver on #userPill
-        const userPill = document.getElementById("userPill");
-        if (userPill) {
-          const obs = new MutationObserver(() => {
-            const text = userPill.textContent.trim();
-            const isLoggedIn = text !== "Guest workspace" && text !== "";
-
-            const loginBtn  = document.getElementById("loginOpen");
-            const logoutBtn = document.getElementById("logoutBtn");
-            if (loginBtn)  loginBtn.style.display  = isLoggedIn ? "none" : "";
-            if (logoutBtn) logoutBtn.style.display = isLoggedIn ? ""     : "none";
-
-            // Update sidebar auth info
-            if (isLoggedIn) {
-              const parts = text.split(": ");
-              updateSidebarAuth({ role: parts[0], username: parts[1] || parts[0] });
-            } else {
-              updateSidebarAuth(null);
-            }
-          });
-          obs.observe(userPill, { characterData: true, childList: true, subtree: true });
-        }
-      });
-    </script>
-
-    <!-- Original app.js — untouched -->
-    <script src="/static/app.js?v=1.2.1"></script>
-  </body>
+  <script src="/static/app.js?v=20260619-simple"></script>
+</body>
 </html>
