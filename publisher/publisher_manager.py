@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime
+import inspect
 import os
 from dotenv import load_dotenv
 from api.notifier import telegram_bot_info, send_telegram
@@ -10,7 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
 
+def _called_from_package_generation():
+    return any(frame.function == "api_full_pipeline" for frame in inspect.stack()[1:6])
+
+
 def _dry_run(dry_run=None):
+    if _called_from_package_generation():
+        return True
     if dry_run is not None:
         return bool(dry_run)
     return os.getenv("POSTING_MODE", "dry_run").strip().lower() != "live"
@@ -27,15 +34,16 @@ def _base(platform, caption, media_url=None):
 
 def publish_post(platform, caption, media_url=None, dry_run=None):
     key = str(platform or "").strip().lower()
+    safe_preview = _dry_run(dry_run)
 
     if key in {"linkedin", "linked in"}:
-        return publish_linkedin(caption, media_url, dry_run)
+        return publish_linkedin(caption, media_url, safe_preview)
 
     if key in {"twitter", "x"}:
-        return publish_x(caption, media_url, dry_run)
+        return publish_x(caption, media_url, safe_preview)
 
     if key == "telegram":
-        if _dry_run(dry_run):
+        if safe_preview:
             result = _base("Telegram", caption, media_url)
             result.update({"status": "dry_run_success", "message": "Telegram preview only."})
             return result
