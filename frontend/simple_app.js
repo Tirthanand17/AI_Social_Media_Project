@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const show = (id, value) => { const el = $(id); if (el) el.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2); };
 const body = (obj) => JSON.stringify(obj);
-const platformName = (x) => x === "X" ? "Twitter" : (x || "Instagram");
+const platformName = (x) => x || "LinkedIn";
 
 let latestCaption = "";
 let latestPostId = null;
@@ -19,7 +19,7 @@ function message(error) {
   const m = String(error?.message || error);
   if (m.includes("404")) return "This backend route is missing. Run api.live_main:app from the latest GitHub clone.";
   if (m.toLowerCase().includes("failed to fetch")) return "Backend is not running. Start uvicorn and open http://127.0.0.1:8010/app";
-  if (m.toLowerCase().includes("token") || m.toLowerCase().includes("credential")) return "API key missing. Keep dry-run mode or add keys in .env.";
+  if (m.toLowerCase().includes("token") || m.toLowerCase().includes("credential")) return "Publishing credential missing. Add it in local/deployment environment settings.";
   return m;
 }
 
@@ -55,7 +55,7 @@ function scoreAdvice(result) {
       score < 50 ? "Improve first-line hook" : "Hook is usable",
       "Add one clear CTA",
       "Use 5-10 focused hashtags",
-      "Use image/reel for Instagram; professional text for LinkedIn"
+      "Use X for short updates, LinkedIn for professional posts, Telegram for notifications"
     ]
   };
 }
@@ -82,7 +82,7 @@ async function boot() {
   $("schedulePost")?.addEventListener("click", schedulePost);
   $("reschedulePost")?.addEventListener("click", reschedulePost);
   $("refreshCalendar")?.addEventListener("click", loadSchedules);
-  $("publishButton")?.addEventListener("click", publishDryRun);
+  $("publishButton")?.addEventListener("click", publishPost);
   $("saveFeedback")?.addEventListener("click", saveFeedback);
   $("loadFeedback")?.addEventListener("click", loadFeedback);
   $("loadBriefButton")?.addEventListener("click", loadBrief);
@@ -92,7 +92,7 @@ async function boot() {
   try { await api("/api/db/init"); } catch {}
   try {
     const [health, config, overview] = await Promise.all([api("/api/health"), api("/api/config"), api("/api/dataset-overview")]);
-    show("apiStatus", health.status === "ok" ? "Online · simple workflow" : "Issue");
+    show("apiStatus", health.status === "ok" ? "Online · publishing workflow" : "Issue");
     show("postingMode", config.posting_mode || "dry_run");
     show("postingModeBadge", config.posting_mode || "dry_run");
     show("datasetCount", (overview.datasets || []).length || "--");
@@ -104,10 +104,10 @@ function showReadiness() {
   const el = $("platformReadiness");
   if (!el) return;
   const rows = [
-    ["Instagram", "Dry-run ready. Live Meta credentials later."],
-    ["Facebook", "Dry-run ready. Live Meta credentials later."],
-    ["LinkedIn", "Ready if token exists; dry-run otherwise."],
-    ["X/Twitter", "Optional/paid API. Keep disabled for MVP."]
+    ["X", "Live-ready with user-context write credentials."],
+    ["LinkedIn", "Live-ready with approved member or organization publishing token."],
+    ["Telegram", "Live-ready with bot token and chat ID."],
+    ["Instagram/Facebook", "Paused for now until Meta credentials are added."]
   ];
   el.innerHTML = rows.map(([a,b]) => `<article class="platform-card ok"><strong>${a}</strong><span>${b}</span></article>`).join("");
 }
@@ -133,7 +133,7 @@ async function generatePackage(ev) {
     const f = new FormData(ev.currentTarget);
     const data = await api("/api/full-pipeline", { method: "POST", body: body({ raw_text: f.get("raw_text"), platform: platformName(f.get("platform")), tone: f.get("tone"), campaign_goal: f.get("campaign_goal") }) });
     latestCaption = data.caption || "";
-    show("rawPostOutput", { caption: data.caption, hashtags: data.hashtags, performance: scoreAdvice(data.engagement_prediction), best_time: data.best_time, next_steps: data.simple_next_steps });
+    show("rawPostOutput", { caption: data.caption, hashtags: data.hashtags, performance: scoreAdvice(data.engagement_prediction), best_time: data.best_time, next_steps: data.simple_next_steps, publish_preview: data.publish_preview });
     show("captionOutput", latestCaption);
     show("hashtagOutput", data.hashtags?.hashtag_string || JSON.stringify(data.hashtags));
     show("safetyOutput", { moderation: data.moderation, plagiarism: data.plagiarism });
@@ -227,10 +227,11 @@ async function loadSchedules() {
   } catch (e) { show("calendarTable", message(e)); }
 }
 
-async function publishDryRun() {
+async function publishPost() {
   try {
     const data = await api("/api/publish", { method: "POST", body: body({ platform: platformName($("publishPlatform").value), caption: $("publishCaption").value, media_url: $("publishMediaUrl").value }) });
-    show("publishOutput", data); toast("Dry-run successful");
+    show("publishOutput", data);
+    toast(data.status === "published" || data.status === "sent" ? "Published" : "Publisher response received");
   } catch (e) { show("publishOutput", message(e)); }
 }
 
