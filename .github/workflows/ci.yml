@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile Python sources
+        run: python -m compileall -q api nlp ml_models publisher scheduler database dashboard data
+
+      - name: Run offline contract tests
+        env:
+          POSTING_MODE: dry_run
+          USE_GEMINI: "false"
+          USE_GROQ: "false"
+        run: python -m unittest discover -s tests -p "test_*.py" -v
