@@ -1,15 +1,43 @@
+# Core data / ML
 pandas
 numpy
 scikit-learn
+xgboost
 joblib
-python-dotenv
+
+# API / application
 fastapi
 uvicorn
 pydantic
-streamlit
-plotly
+python-multipart
+python-dotenv
+httpx
 requests
 requests-oauthlib
+
+# Database
+sqlalchemy
+pymysql
+
+# Dashboard
+streamlit
+plotly
+
+# AI providers used by the project
 google-genai
 groq
-xgboost
+
+# Background jobs / integrations described in PROJECT_GUIDE.md
+schedule
+feedparser
+redis
+slowapi
+
+# Optional NLP integrations from the guide.
+# The current repository includes lightweight offline fallbacks, so these are
+# intentionally not required for the default demo runtime:
+# spacy
+# pytrends
+# googletrans==4.0.0rc1
+# transformers
+# torch
