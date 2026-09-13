@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    startCommand: python -m uvicorn api.secure_main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_ENV
         value: production
@@ -12,6 +12,8 @@ services:
         value: dry_run
       - key: DEMO_LOGIN_ENABLED
         value: false
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 60
       - key: ALLOWED_ORIGINS
         sync: false
       - key: APP_SECRET
