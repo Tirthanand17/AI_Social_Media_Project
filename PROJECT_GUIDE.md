@@ -33,6 +33,8 @@ Build a full AI-powered social media management platform that:
 
 All 10 datasets are located in `data/raw/`. Each dataset is purpose-built for specific tasks.
 
+**Dataset provenance note:** the repository ships illustrative/sample records for reproducible portfolio and classroom use. Treat them as demo data rather than live customer or platform data.
+
 | # | File | Used In Tasks | What It Contains |
 |---|------|--------------|------------------|
 | 1 | `01_social_media_engagement.csv` | Task 6, 7 | 60 real-style posts — raw data for cleaning phase |
