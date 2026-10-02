@@ -3,6 +3,10 @@
 
 ---
 
+## Public dataset note
+
+The bundled CSV files are **sample/demo datasets for this portfolio project**. They are intended for reproducible development, testing, and classroom demonstration and should not be interpreted as live customer accounts or current social-platform measurements. Example user emails use the reserved `example.com` domain.
+
 ## Quick Reference Table
 
 | File | Dataset Name | Task(s) | Size | Purpose |
@@ -24,8 +28,8 @@
 **File:** `01_social_media_engagement.csv`
 **Tasks:** Task 6 (download datasets), Task 7 (clean data)
 
-This is your RAW dataset — exactly what you download from Kaggle and put into `data/raw/`.
-After Task 7 (clean_data.py), it becomes `data/cleaned/engagement_clean.csv`.
+This is the bundled RAW sample dataset used by the project and stored in `data/raw/`.
+After Task 7 (`clean_data.py`), it becomes `data/cleaned/engagement_clean.csv`.
 
 **Key Columns:**
 - `post_id` — unique ID for each post
