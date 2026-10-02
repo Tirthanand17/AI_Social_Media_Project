@@ -1,6 +1,8 @@
 # AI Social Media Automation Platform
 
-Private AI-assisted social-media management project built from the 52-task / 12-phase specification in [`PROJECT_GUIDE.md`](PROJECT_GUIDE.md).
+[![CI](https://github.com/Tirthanand17/AI_Social_Media_Project/actions/workflows/ci.yml/badge.svg)](https://github.com/Tirthanand17/AI_Social_Media_Project/actions/workflows/ci.yml)
+
+Portfolio-ready AI-assisted social-media management project built from the 52-task / 12-phase specification in [`PROJECT_GUIDE.md`](PROJECT_GUIDE.md).
 
 The repository includes caption and hashtag generation, content intelligence, trend analysis, moderation, plagiarism checks, multilingual fallback support, image/video prompt generation, engagement prediction, best-time recommendations, scheduling data, analytics, A/B analysis, competitor tracking, role-based demo authentication, dashboards, notifications, and multi-platform publishing adapters.
 
@@ -10,7 +12,9 @@ The repository includes caption and hashtag generation, content intelligence, tr
 
 `PROJECT_GUIDE.md` is the preserved implementation guide and contains all 52 documented tasks, the 12 phases, dataset mapping, original setup steps, testing table, deployment guidance, and the PRED smart performance predictor requirements.
 
-All 10 documented datasets are included under `data/raw/`.
+All 10 documented sample datasets are included under `data/raw/`.
+
+> **Dataset note:** bundled records are illustrative/demo data for reproducible development and testing. They are not live customer accounts, live platform analytics, or production credentials.
 
 ## Current architecture
 
