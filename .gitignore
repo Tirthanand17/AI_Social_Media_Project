@@ -1,5 +1,7 @@
 venv/
 .env
+.env.*
+!.env.example
 __pycache__/
 *.pyc
 *.pkl
@@ -7,3 +9,9 @@ logs/
 backups/
 .DS_Store
 .ipynb_checkpoints/
+
+# Credentials / local secrets
+*.pem
+*.key
+credentials.json
+secrets.json
