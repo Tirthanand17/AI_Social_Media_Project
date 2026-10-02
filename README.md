@@ -8,6 +8,19 @@ The repository includes caption and hashtag generation, content intelligence, tr
 
 > **Safe default:** real social-media posting is disabled unless `POSTING_MODE=live` is explicitly configured. Keep `POSTING_MODE=dry_run` while developing or demonstrating the project.
 
+
+## Recruiter Snapshot
+
+| Area | Evidence |
+|---|---|
+| **AI / NLP** | Caption generation, hashtags, keyword/trend analysis, moderation, plagiarism checks, multilingual fallback |
+| **Machine learning** | Engagement prediction, best-time recommendations, A/B analysis, PRED performance dashboard |
+| **Backend** | FastAPI, SQLite/MySQL paths, scheduling, analytics, role-based flows |
+| **Frontend / dashboards** | Browser app plus Streamlit dashboards and admin views |
+| **Integrations** | Facebook, Instagram, LinkedIn, X/Twitter and Telegram-oriented adapters |
+| **Safety & quality** | Dry-run publishing by default, environment-based credentials, automated CI and offline tests |
+
+
 ## Project specification
 
 `PROJECT_GUIDE.md` is the preserved implementation guide and contains all 52 documented tasks, the 12 phases, dataset mapping, original setup steps, testing table, deployment guidance, and the PRED smart performance predictor requirements.
